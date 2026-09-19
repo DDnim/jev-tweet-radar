@@ -35,6 +35,11 @@ export const QUESTIONS = {
     instructions: 'この投稿は後で読み返すためにブックマークする価値があるか？ 手順・データ・リンク・考え方など、時間が経っても参照する価値がある内容か。一時的な話題や感想ではない。',
     criteria: { true: '後で参照する価値がある', false: '一過性で保存する価値はない' }
   },
+  spam: {
+    type: 'noul',
+    instructions: 'この投稿はスパム・ジャンクか？ 宣伝・アフィリエイト・詐欺や副業勧誘、bot や自動投稿、フォロー乞い・いいね乞い・エンゲージメント稼ぎ、他人のコンテンツの無断コピー、無関係なハッシュタグの羅列、繰り返し投稿される定型文など、読む価値のない投稿か。',
+    criteria: { true: 'スパム・ジャンクである', false: '実質のある通常の投稿' }
+  },
   ai_smell: {
     type: 'noul',
     instructions: 'この投稿は生成AIが書いた文章のように見えるか？ 定型的な構成、箇条書きと絵文字の多用、「〜を解説します」「まとめると」のような無個性な言い回し、汎用的で具体性のない内容、不自然に整った文体。',
@@ -49,11 +54,36 @@ export const LABELS = {
   misread: { ja: '誤解', zh: '被误读', en: 'Misread' },
   repost: { ja: 'リポスト価値', zh: '值得转发', en: 'Repost-worthy' },
   bookmark: { ja: '保存価値', zh: '值得收藏', en: 'Bookmark-worthy' },
+  spam: { ja: 'スパム', zh: '垃圾', en: 'Spam' },
   ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
 };
 // Selectable tags in display order; `engage` is always asked and shown as the main badge.
-export const TAG_ORDER = ['buzz', 'flame', 'ignored', 'misread', 'repost', 'bookmark', 'ai_smell'];
-export const DEFAULT_TAGS = ['buzz', 'misread', 'repost', 'bookmark', 'ai_smell'];
+export const TAG_ORDER = ['spam', 'buzz', 'flame', 'ignored', 'misread', 'repost', 'bookmark', 'ai_smell'];
+export const DEFAULT_TAGS = ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'];
+
+// Timeline filter: a matched post is shown at 50% opacity and restored on hover. `rules` is keyed by tag:
+// { on, op: 'ge'|'lt', v }. A rule's tag is asked even when it is not a displayed tag, so a filter can run silently.
+export const DEFAULT_FILTER = {
+  on: true,
+  rules: {
+    spam: { on: true, op: 'ge', v: 0.7 },
+    ai_smell: { on: false, op: 'ge', v: 0.7 },
+    flame: { on: false, op: 'ge', v: 0.7 },
+    ignored: { on: false, op: 'ge', v: 0.7 },
+    engage: { on: false, op: 'lt', v: 0.3 }
+  }
+};
+export function filterReasons(answers, filter) {
+  if (!filter?.on) return [];
+  const out = [];
+  for (const [tag, r] of Object.entries(filter.rules || {})) {
+    if (!r?.on) continue;
+    const v = answers[tag];
+    if (v == null) continue;
+    if (r.op === 'lt' ? v < r.v : v >= r.v) out.push(tag);
+  }
+  return out;
+}
 
 // Viewer goal presets. The goal is placed in `state.viewer_goal` and rewrites the `engage` question so
 // "worth engaging" is judged relative to what the viewer wants; other tags stay objective.

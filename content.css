@@ -24,3 +24,8 @@
 .jev-draft-head{font:11px/1.4 -apple-system,"Hiragino Sans",sans-serif;color:#8b98a5;letter-spacing:.04em;margin-bottom:4px}
 .jev-draft .jev-radar{margin:0}
 @media (prefers-color-scheme: light){.jev-draft{border-color:#cfd9de}}
+
+.jev-chip.jev-spam.jev-on{background:#4a1f10;border-color:#b5541f}
+/* timeline filter */
+.jev-dim{opacity:.5;transition:opacity .15s}
+.jev-dim:hover{opacity:1}

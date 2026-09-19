@@ -1,7 +1,7 @@
-import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor } from './questions.js';
+import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor, DEFAULT_FILTER, filterReasons } from './questions.js';
 
 const API = 'https://api.typesafe.ai/v1/systemone';
-const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '' };
+const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER };
 const MEM_CACHE = new Map(); // tweetId → answers (per service-worker lifetime; persistent cache lives in chrome.storage.local)
 const inflight = new Map();
 let windowStart = Date.now(), windowCount = 0;
@@ -10,7 +10,10 @@ async function getSettings() {
   const s = await chrome.storage.sync.get(DEFAULTS);
   const merged = { ...DEFAULTS, ...s };
   merged.tags = TAG_ORDER.filter(t => merged.tags.includes(t));
-  merged.keys = ['engage', ...merged.tags];
+  merged.filter = { ...DEFAULT_FILTER, ...(merged.filter || {}), rules: { ...DEFAULT_FILTER.rules, ...(merged.filter?.rules || {}) } };
+  // Tags a live filter rule needs are asked too, even when hidden from the badge row.
+  const ruleTags = !merged.filter.on ? [] : Object.entries(merged.filter.rules).filter(([, r]) => r.on).map(([t]) => t);
+  merged.keys = ['engage', ...TAG_ORDER.filter(t => merged.tags.includes(t) || ruleTags.includes(t))];
   merged.goalText = merged.goalPreset === 'custom' ? (merged.goalCustom || '').trim() : (GOALS[merged.goalPreset]?.text || '');
   return merged;
 }
@@ -89,12 +92,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!settings.apiKey) return { error: 'no_key' };
     const k = cacheKey(msg.post.id, settings);
     const hit = await cached(k);
-    if (hit) return { answers: hit, settings };
-    if (inflight.has(k)) return { answers: await inflight.get(k), settings };
+    const reply = a => ({ answers: a, settings, filtered: msg.post.replyingTo || String(msg.post.id).startsWith('draft:') ? [] : filterReasons(a, settings.filter) });
+    if (hit) return reply(hit);
+    if (inflight.has(k)) return reply(await inflight.get(k));
     if (!rateOk(settings.maxPerMinute)) return { skipped: 'rate' };
     const p = judge(msg.post, settings).then(async a => { await remember(k, a); return a; }).finally(() => inflight.delete(k));
     inflight.set(k, p);
-    try { return { answers: await p, settings }; } catch (e) { return { error: String(e.message || e) }; }
+    try { return reply(await p); } catch (e) { return { error: String(e.message || e) }; }
   })().then(sendResponse);
   return true;
 });

@@ -5,7 +5,7 @@
 UI は日本語 / 中文 / English（ブラウザ言語で自動、設定で変更可）。
 
 X (Twitter) のタイムラインで、画面に入った各ポストを Jev（TypeSafe System One Model）に 1 回だけ問い合わせ、
-**絡む価値** と選択したタグ（バズる / 炎上 / スルー / 誤解 / リポスト価値 / 保存価値 / AI臭）の校正済み確率を本文の下に表示する Chrome 拡張。
+**絡む価値** と選択したタグ（スパム / バズる / 炎上 / スルー / 誤解 / リポスト価値 / 保存価値 / AI臭）の校正済み確率を本文の下に表示する Chrome 拡張。
 
 ## インストール
 1. `chrome://extensions` → 右上「デベロッパーモード」ON → 「パッケージ化されていない拡張機能を読み込む」でこのフォルダを選択。
@@ -24,13 +24,17 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 ## 目的プリセット
 オプションの「私の目的」で **フォロワーを増やしたい / 学びたい / 刺激がほしい** を選ぶか、自由記述で目的を書く。目的は `state.viewer_goal` として Jev に渡され、「絡む価値」の質問文が目的基準に切り替わる（他のタグは客観判定のまま）。目的ごとにキャッシュは別。
 
+## タイムラインのフィルタ
+オプションの「タイムラインのフィルタ」で条件（例：スパム ≥ 0.7、AI臭 ≥ 0.7、絡む価値 < 0.3）を有効にすると、該当したポストは **50% の透明度** で表示され、マウスを乗せると元に戻る。条件に使うタグは表示タグから外していても問い合わせる。自分の下書きには適用しない。
+
 ## 投稿前判定
 発言欄（返信欄も）に 8 文字以上入力して 1.2 秒止まると、同じ軸で下書きを採点してツールバーの上に表示する。返信は返信先の投稿を `state.replying_to` として一緒に送り、組み合わせで判定する。
 
 ## English
 
-Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
+Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *spam / buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
 
+- Timeline filter: rules such as *spam ≥ 0.7* or *engage < 0.3* fade matched posts to 50% opacity; hover restores them.
 - UI in Japanese / Chinese / English, auto-detected from the browser language, switchable in Options.
 - Load unpacked from `chrome://extensions`, paste your TypeSafe API key in Options, open x.com.
 - One judgment ≈ 300 input tokens ≈ $0.00001; output is free. The popup shows today's count and cost.
@@ -38,8 +42,9 @@ Chrome extension (MV3) that scores every post on your X timeline with **one** ca
 
 ## 中文
 
-Chrome 扩展（MV3）。刷 X 时间线时，对进入视野的每条帖子只向 [Jev](https://typesafe.ai)（TypeSafe System One Model）发一次请求，在正文下方显示 **值得互动** 和你勾选的标签（会火 / 炎上 / 无人理 / 被误读 / 值得转发 / 值得收藏 / AI 味）的校准概率。可选目的（涨粉 / 学习 / 找刺激 / 自定义），“值得互动”会按该目的判定。你自己的草稿（以及回复，会连同原帖一起）在点发送之前也会被判定。
+Chrome 扩展（MV3）。刷 X 时间线时，对进入视野的每条帖子只向 [Jev](https://typesafe.ai)（TypeSafe System One Model）发一次请求，在正文下方显示 **值得互动** 和你勾选的标签（垃圾 / 会火 / 炎上 / 无人理 / 被误读 / 值得转发 / 值得收藏 / AI 味）的校准概率。可选目的（涨粉 / 学习 / 找刺激 / 自定义），“值得互动”会按该目的判定。你自己的草稿（以及回复，会连同原帖一起）在点发送之前也会被判定。
 
+- 时间线过滤：设置条件（如 垃圾 ≥ 0.7、值得互动 < 0.3），命中的帖子以 50% 透明度显示，鼠标移上去恢复。
 - 界面支持中文 / 日本語 / English，按浏览器语言自动选择，可在设置中切换。
 - 在 `chrome://extensions` 开启开发者模式，“加载已解压的扩展程序”选择本文件夹；在设置中粘贴 TypeSafe API key；打开 x.com。
 - 1 次判定 ≈ 300 input token ≈ $0.00001，output 免费。弹窗显示今日次数和费用。
