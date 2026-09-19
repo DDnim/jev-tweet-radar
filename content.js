@@ -5,9 +5,10 @@ const LABELS = {
   flame: { ja: '炎上', zh: '炎上', en: 'Flame' },
   ignored: { ja: 'スルー', zh: '无人理', en: 'Ignored' },
   misread: { ja: '誤解', zh: '被误读', en: 'Misread' },
+  repost: { ja: 'リポスト価値', zh: '值得转发', en: 'Repost-worthy' },
+  bookmark: { ja: '保存価値', zh: '值得收藏', en: 'Bookmark-worthy' },
   ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
 };
-const TAGS = ['buzz', 'flame', 'ignored', 'misread', 'ai_smell'];
 const seen = new WeakSet();
 
 function extract(article) {
@@ -43,7 +44,7 @@ function render(article, answers, settings) {
   main.textContent = `${LABELS.engage[lang]} ${pct(e)}`;
   main.title = 'Jev: この投稿に絡む価値があるかの確率（校正済み）';
   row.appendChild(main);
-  for (const k of TAGS) {
+  for (const k of (settings.tags || ['buzz', 'flame', 'ignored', 'misread', 'ai_smell'])) {
     const v = answers[k];
     const chip = document.createElement('span');
     chip.className = 'jev-chip jev-' + k + (v != null && v >= th ? ' jev-on' : '');

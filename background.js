@@ -1,27 +1,30 @@
-import { QUESTIONS } from './questions.js';
+import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS } from './questions.js';
 
 const API = 'https://api.typesafe.ai/v1/systemone';
-const DEFAULTS = { apiKey: '', enabled: true, lang: 'ja', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest' };
+const DEFAULTS = { apiKey: '', enabled: true, lang: 'ja', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS };
 const MEM_CACHE = new Map(); // tweetId → answers (per service-worker lifetime; persistent cache lives in chrome.storage.local)
 const inflight = new Map();
 let windowStart = Date.now(), windowCount = 0;
 
 async function getSettings() {
   const s = await chrome.storage.sync.get(DEFAULTS);
-  return { ...DEFAULTS, ...s };
+  const merged = { ...DEFAULTS, ...s };
+  merged.tags = TAG_ORDER.filter(t => merged.tags.includes(t));
+  merged.keys = ['engage', ...merged.tags];
+  return merged;
 }
+const cacheKey = (id, settings) => 'r:' + id + ':' + settings.keys.join(',');
 
-async function cached(id) {
-  if (MEM_CACHE.has(id)) return MEM_CACHE.get(id);
-  const k = 'r:' + id;
+async function cached(k) {
+  if (MEM_CACHE.has(k)) return MEM_CACHE.get(k);
   const v = (await chrome.storage.local.get(k))[k];
-  if (v) MEM_CACHE.set(id, v);
+  if (v) MEM_CACHE.set(k, v);
   return v;
 }
 
-async function remember(id, answers) {
-  MEM_CACHE.set(id, answers);
-  await chrome.storage.local.set({ ['r:' + id]: answers });
+async function remember(k, answers) {
+  MEM_CACHE.set(k, answers);
+  await chrome.storage.local.set({ [k]: answers });
 }
 
 async function bumpStats(usage) {
@@ -50,7 +53,8 @@ async function judge(post, settings) {
     is_reply: post.isReply,
     text: post.text
   };
-  const body = { state, model: settings.model, questions: QUESTIONS };
+  const questions = Object.fromEntries(settings.keys.map(k => [k, QUESTIONS[k]]));
+  const body = { state, model: settings.model, questions };
   let delay = 800;
   for (let attempt = 0; attempt < 4; attempt++) {
     const r = await fetch(API, {
@@ -62,7 +66,7 @@ async function judge(post, settings) {
     if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`);
     const j = await r.json();
     const out = {};
-    for (const k of Object.keys(QUESTIONS)) out[k] = j.answers?.[k]?.noul ?? null;
+    for (const k of settings.keys) out[k] = j.answers?.[k]?.noul ?? null;
     out.ts = Date.now();
     await bumpStats(j.usage);
     return out;
@@ -76,12 +80,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const settings = await getSettings();
     if (!settings.enabled) return { skipped: 'disabled' };
     if (!settings.apiKey) return { error: 'no_key' };
-    const hit = await cached(msg.post.id);
+    const k = cacheKey(msg.post.id, settings);
+    const hit = await cached(k);
     if (hit) return { answers: hit, settings };
-    if (inflight.has(msg.post.id)) return { answers: await inflight.get(msg.post.id), settings };
+    if (inflight.has(k)) return { answers: await inflight.get(k), settings };
     if (!rateOk(settings.maxPerMinute)) return { skipped: 'rate' };
-    const p = judge(msg.post, settings).then(async a => { await remember(msg.post.id, a); return a; }).finally(() => inflight.delete(msg.post.id));
-    inflight.set(msg.post.id, p);
+    const p = judge(msg.post, settings).then(async a => { await remember(k, a); return a; }).finally(() => inflight.delete(k));
+    inflight.set(k, p);
     try { return { answers: await p, settings }; } catch (e) { return { error: String(e.message || e) }; }
   })().then(sendResponse);
   return true;
