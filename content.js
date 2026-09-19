@@ -57,6 +57,32 @@ function applyFilter(article, answers, settings, reasons) {
   article.title = JEV_I18N.t('filtered', lang, { r: reason });
 }
 
+function buildRow(answers, settings) {
+  const lang = settings.lang || uiLang;
+  const th = settings.threshold ?? 0.5;
+  const row = document.createElement('div');
+  row.className = 'jev-radar';
+  const e = answers.engage;
+  const level = e == null ? 'na' : e >= 0.7 ? 'hi' : e >= th ? 'mid' : 'lo';
+  const main = document.createElement('span');
+  main.className = 'jev-main jev-' + level;
+  main.textContent = `${LABELS.engage[lang]} ${pct(e)}`;
+  main.title = settings.goalText ? JEV_I18N.t('tipGoal', lang, { g: settings.goalText.slice(0, 40) }) : JEV_I18N.t('tipGeneric', lang);
+  row.appendChild(main);
+  for (const k of (settings.tags || ['spam', 'buzz', 'misread', 'ai_smell'])) {
+    const v = answers[k];
+    const chip = document.createElement('span');
+    chip.className = 'jev-chip jev-' + k + (v != null && v >= th ? ' jev-on' : '');
+    chip.textContent = `${LABELS[k][lang]} ${pct(v)}`;
+    row.appendChild(chip);
+  }
+  const foot = document.createElement('span');
+  foot.className = 'jev-foot';
+  foot.textContent = 'Jev';
+  row.appendChild(foot);
+  return row;
+}
+
 // ---- Composer (your own draft): judge after typing pauses, show the same badge row under the textbox. ----
 const DRAFT_MIN = 8, DRAFT_DEBOUNCE = 1200;
 const wiredBoxes = new WeakSet();
