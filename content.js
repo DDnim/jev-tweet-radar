@@ -88,7 +88,8 @@ function renderDraft(box, answers, settings, text) {
   panel.innerHTML = '';
   const head = document.createElement('div');
   head.className = 'jev-draft-head';
-  head.textContent = (settings.lang === 'zh' ? '投稿前判定 · Jev' : settings.lang === 'en' ? 'Pre-post check · Jev' : '投稿前判定 · Jev');
+  const isReply = panel.dataset.reply === '1';
+  head.textContent = settings.lang === 'zh' ? (isReply ? '回复判定（结合原帖）· Jev' : '发帖前判定 · Jev') : settings.lang === 'en' ? (isReply ? 'Reply check (with parent) · Jev' : 'Pre-post check · Jev') : (isReply ? '返信判定（返信先を含めて）· Jev' : '投稿前判定 · Jev');
   panel.appendChild(head);
   const row = buildRow(answers, settings);
   panel.appendChild(row);
@@ -98,6 +99,20 @@ function renderDraftNote(box, text) {
   const panel = draftPanel(box);
   panel.innerHTML = '';
   const d = document.createElement('div'); d.className = 'jev-draft-head'; d.textContent = text; panel.appendChild(d);
+}
+
+// The post a composer is replying to: the article inside the reply dialog, or the last article above an inline reply box.
+function replyTarget(box) {
+  const dialog = box.closest('[role="dialog"]');
+  let article = dialog ? dialog.querySelector('article[data-testid="tweet"]') : null;
+  if (!article && !dialog) {
+    for (const a of document.querySelectorAll('article[data-testid="tweet"]')) {
+      if (a.compareDocumentPosition(box) & Node.DOCUMENT_POSITION_FOLLOWING) article = a; else break;
+    }
+  }
+  if (!article) return null;
+  const p = extract(article);
+  return p ? { id: p.id, author: p.author, text: p.text } : null;
 }
 
 function wireComposer(box) {
@@ -110,11 +125,12 @@ function wireComposer(box) {
     if (text === last) return;
     last = text;
     renderDraftNote(box, '判定中…');
-    const post = { id: 'draft:' + hash(text), author: 'me (draft)', text, time: new Date().toISOString(), hasMedia: false, hasLink: /https?:\/\//.test(text), isReply: !!box.closest('[data-testid="inline_reply_offscreen"]') };
+    const parent = replyTarget(box);
+    const post = { id: 'draft:' + hash((parent ? parent.id + '|' : '') + text), author: 'me (draft)', text, time: new Date().toISOString(), hasMedia: false, hasLink: /https?:\/\//.test(text), isReply: !!parent, replyingTo: parent };
     chrome.runtime.sendMessage({ type: 'judge', post }, res => {
       if (chrome.runtime.lastError || !res) return;
       if (box.innerText.replace(/\u200b/g, '').trim() !== text) return; // stale
-      if (res.answers) renderDraft(box, res.answers, res.settings || {}, text);
+      if (res.answers) { draftPanel(box).dataset.reply = parent ? '1' : '0'; renderDraft(box, res.answers, res.settings || {}, text); }
       else if (res.error === 'no_key') renderDraftNote(box, 'Jev Tweet Radar: API キー未設定');
       else if (res.error) renderDraftNote(box, 'Jev: ' + res.error);
       else if (res.skipped === 'rate') renderDraftNote(box, 'Jev: 判定上限、少し待ってください');
