@@ -29,3 +29,5 @@
 /* timeline filter */
 .jev-dim{opacity:.5;transition:opacity .15s}
 .jev-dim:hover{opacity:1}
+.jev-why{padding:1px 8px;border-radius:999px;background:#3a1010;color:#ff8f8f;border:1px solid #8a2a2a}
+@media (prefers-color-scheme: light){.jev-why{background:#ffe3e3;color:#a11;border-color:#f0a0a0}}
