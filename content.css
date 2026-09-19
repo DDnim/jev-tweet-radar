@@ -1,0 +1,20 @@
+.jev-radar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 2px;font:12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Hiragino Sans",sans-serif}
+.jev-main{padding:2px 9px;border-radius:999px;font-weight:700;border:1px solid transparent}
+.jev-hi{background:#0f3d2e;color:#7fe0b2;border-color:#1f7a5a}
+.jev-mid{background:#3a2e0f;color:#ffd27a;border-color:#7a5f1f}
+.jev-lo,.jev-na{background:#2a2f33;color:#8b98a5;border-color:#3d444b}
+.jev-chip{padding:1px 8px;border-radius:999px;background:#1e2327;color:#8b98a5;border:1px solid #2f3a42}
+.jev-chip.jev-on{color:#e7e9ea;font-weight:600}
+.jev-chip.jev-buzz.jev-on{background:#123a5c;border-color:#1d6fb0}
+.jev-chip.jev-flame.jev-on{background:#4d1b1b;border-color:#b03a3a}
+.jev-chip.jev-ignored.jev-on{background:#2f2f2f;border-color:#6b6b6b}
+.jev-chip.jev-misread.jev-on{background:#3f2d5c;border-color:#7b57b8}
+.jev-chip.jev-ai_smell.jev-on{background:#4a3c10;border-color:#a8891f}
+.jev-foot{margin-left:auto;color:#536471;font-size:10px;letter-spacing:.08em}
+.jev-note{color:#8b98a5;font-size:11px}
+@media (prefers-color-scheme: light){
+ .jev-chip{background:#eff3f4;color:#536471;border-color:#cfd9de}
+ .jev-lo,.jev-na{background:#eff3f4;color:#536471;border-color:#cfd9de}
+ .jev-hi{background:#dff5ea;color:#0a6b47;border-color:#7fd1ad}
+ .jev-mid{background:#fff1d6;color:#7a4e00;border-color:#f0c36a}
+}

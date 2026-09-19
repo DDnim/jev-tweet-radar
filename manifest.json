@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Jev Tweet Radar",
+  "version": "0.1.0",
+  "description": "タイムラインの各ポストを Jev（System One Model）が 1 回の判定で採点：絡む価値 / バズる / 炎上 / スルー / 誤解 / AI臭",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.typesafe.ai/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Jev Tweet Radar"
+  },
+  "icons": {
+    "128": "icon128.png"
+  }
+}
