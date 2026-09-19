@@ -31,10 +31,15 @@ function extract(article) {
 function pct(v) { return v == null ? '–' : Math.round(v * 100) + '%'; }
 
 function render(article, answers, settings) {
-  const lang = settings.lang || 'ja';
-  const th = settings.threshold ?? 0.5;
   const textEl = article.querySelector('[data-testid="tweetText"]');
   if (!textEl || article.querySelector('.jev-radar')) return;
+  const row = buildRow(answers, settings);
+  textEl.insertAdjacentElement('afterend', row);
+}
+
+function buildRow(answers, settings) {
+  const lang = settings.lang || 'ja';
+  const th = settings.threshold ?? 0.5;
   const row = document.createElement('div');
   row.className = 'jev-radar';
   const e = answers.engage;
@@ -55,7 +60,71 @@ function render(article, answers, settings) {
   foot.className = 'jev-foot';
   foot.textContent = 'Jev';
   row.appendChild(foot);
-  textEl.insertAdjacentElement('afterend', row);
+  return row;
+}
+
+// ---- Composer (your own draft): judge after typing pauses, show the same badge row under the textbox. ----
+const DRAFT_MIN = 8, DRAFT_DEBOUNCE = 1200;
+const wiredBoxes = new WeakSet();
+
+function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+
+const panels = new WeakMap();
+function draftPanel(box) {
+  let panel = panels.get(box);
+  if (panel && panel.isConnected) return panel;
+  panel = document.createElement('div');
+  panel.className = 'jev-draft';
+  // Walk up until an ancestor that also contains the composer toolbar, then insert the panel right above that toolbar.
+  let node = box, toolbar = null;
+  while (node && node !== document.body) { toolbar = node.querySelector?.('[data-testid="toolBar"]'); if (toolbar) break; node = node.parentElement; }
+  if (toolbar) toolbar.insertAdjacentElement('beforebegin', panel); else box.parentElement.appendChild(panel);
+  panels.set(box, panel);
+  return panel;
+}
+
+function renderDraft(box, answers, settings, text) {
+  const panel = draftPanel(box);
+  panel.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'jev-draft-head';
+  head.textContent = (settings.lang === 'zh' ? '投稿前判定 · Jev' : settings.lang === 'en' ? 'Pre-post check · Jev' : '投稿前判定 · Jev');
+  panel.appendChild(head);
+  const row = buildRow(answers, settings);
+  panel.appendChild(row);
+}
+
+function renderDraftNote(box, text) {
+  const panel = draftPanel(box);
+  panel.innerHTML = '';
+  const d = document.createElement('div'); d.className = 'jev-draft-head'; d.textContent = text; panel.appendChild(d);
+}
+
+function wireComposer(box) {
+  if (wiredBoxes.has(box)) return;
+  wiredBoxes.add(box);
+  let timer = null, last = '';
+  const run = () => {
+    const text = box.innerText.replace(/\u200b/g, '').trim();
+    if (text.length < DRAFT_MIN) { panels.get(box)?.remove(); last = ''; return; }
+    if (text === last) return;
+    last = text;
+    renderDraftNote(box, '判定中…');
+    const post = { id: 'draft:' + hash(text), author: 'me (draft)', text, time: new Date().toISOString(), hasMedia: false, hasLink: /https?:\/\//.test(text), isReply: !!box.closest('[data-testid="inline_reply_offscreen"]') };
+    chrome.runtime.sendMessage({ type: 'judge', post }, res => {
+      if (chrome.runtime.lastError || !res) return;
+      if (box.innerText.replace(/\u200b/g, '').trim() !== text) return; // stale
+      if (res.answers) renderDraft(box, res.answers, res.settings || {}, text);
+      else if (res.error === 'no_key') renderDraftNote(box, 'Jev Tweet Radar: API キー未設定');
+      else if (res.error) renderDraftNote(box, 'Jev: ' + res.error);
+      else if (res.skipped === 'rate') renderDraftNote(box, 'Jev: 判定上限、少し待ってください');
+    });
+  };
+  box.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, DRAFT_DEBOUNCE); });
+}
+
+function scanComposers() {
+  for (const box of document.querySelectorAll('[data-testid^="tweetTextarea_"][contenteditable="true"]')) wireComposer(box);
 }
 
 function renderNote(article, text) {
@@ -91,5 +160,5 @@ function scan() {
     io.observe(a);
   }
 }
-new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });
-scan();
+new MutationObserver(() => { scan(); scanComposers(); }).observe(document.body, { childList: true, subtree: true });
+scan(); scanComposers();
