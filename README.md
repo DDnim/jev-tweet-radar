@@ -1,6 +1,8 @@
 # Jev Tweet Radar
 
-[English below](#english) · MIT License
+[English below](#english) · [中文在下方](#中文) · MIT License
+
+UI は日本語 / 中文 / English（ブラウザ言語で自動、設定で変更可）。
 
 X (Twitter) のタイムラインで、画面に入った各ポストを Jev（TypeSafe System One Model）に 1 回だけ問い合わせ、
 **絡む価値** と選択したタグ（バズる / 炎上 / スルー / 誤解 / リポスト価値 / 保存価値 / AI臭）の校正済み確率を本文の下に表示する Chrome 拡張。
@@ -29,6 +31,16 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 
 Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
 
+- UI in Japanese / Chinese / English, auto-detected from the browser language, switchable in Options.
 - Load unpacked from `chrome://extensions`, paste your TypeSafe API key in Options, open x.com.
 - One judgment ≈ 300 input tokens ≈ $0.00001; output is free. The popup shows today's count and cost.
 - Jev returns no rationale. Probabilities are calibrated, not infallible. Post text is sent to api.typesafe.ai.
+
+## 中文
+
+Chrome 扩展（MV3）。刷 X 时间线时，对进入视野的每条帖子只向 [Jev](https://typesafe.ai)（TypeSafe System One Model）发一次请求，在正文下方显示 **值得互动** 和你勾选的标签（会火 / 炎上 / 无人理 / 被误读 / 值得转发 / 值得收藏 / AI 味）的校准概率。可选目的（涨粉 / 学习 / 找刺激 / 自定义），“值得互动”会按该目的判定。你自己的草稿（以及回复，会连同原帖一起）在点发送之前也会被判定。
+
+- 界面支持中文 / 日本語 / English，按浏览器语言自动选择，可在设置中切换。
+- 在 `chrome://extensions` 开启开发者模式，“加载已解压的扩展程序”选择本文件夹；在设置中粘贴 TypeSafe API key；打开 x.com。
+- 1 次判定 ≈ 300 input token ≈ $0.00001，output 免费。弹窗显示今日次数和费用。
+- Jev 不返回理由。概率已校准但并非总是正确。帖子正文会发送到 api.typesafe.ai。
