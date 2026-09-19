@@ -25,6 +25,16 @@ export const QUESTIONS = {
     instructions: 'この投稿は書き手の意図と違う意味で受け取られる（誤解される）可能性が高いか？ 皮肉が皮肉と伝わらない、主語や前提が抜けている、省略が多い、多義的な表現。',
     criteria: { true: '誤読されやすい', false: '意図が明確に伝わる' }
   },
+  repost: {
+    type: 'noul',
+    instructions: 'この投稿は自分のフォロワーにリポスト（拡散）する価値があるか？ 情報として有用・正確そう・新しい・多くの人に関係し、宣伝や釣りではない。',
+    criteria: { true: 'リポストする価値がある', false: 'リポストするほどではない' }
+  },
+  bookmark: {
+    type: 'noul',
+    instructions: 'この投稿は後で読み返すためにブックマークする価値があるか？ 手順・データ・リンク・考え方など、時間が経っても参照する価値がある内容か。一時的な話題や感想ではない。',
+    criteria: { true: '後で参照する価値がある', false: '一過性で保存する価値はない' }
+  },
   ai_smell: {
     type: 'noul',
     instructions: 'この投稿は生成AIが書いた文章のように見えるか？ 定型的な構成、箇条書きと絵文字の多用、「〜を解説します」「まとめると」のような無個性な言い回し、汎用的で具体性のない内容、不自然に整った文体。',
@@ -37,5 +47,10 @@ export const LABELS = {
   flame: { ja: '炎上', zh: '炎上', en: 'Flame' },
   ignored: { ja: 'スルー', zh: '无人理', en: 'Ignored' },
   misread: { ja: '誤解', zh: '被误读', en: 'Misread' },
+  repost: { ja: 'リポスト価値', zh: '值得转发', en: 'Repost-worthy' },
+  bookmark: { ja: '保存価値', zh: '值得收藏', en: 'Bookmark-worthy' },
   ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
 };
+// Selectable tags in display order; `engage` is always asked and shown as the main badge.
+export const TAG_ORDER = ['buzz', 'flame', 'ignored', 'misread', 'repost', 'bookmark', 'ai_smell'];
+export const DEFAULT_TAGS = ['buzz', 'misread', 'repost', 'bookmark', 'ai_smell'];
