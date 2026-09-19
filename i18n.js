@@ -10,6 +10,7 @@ const JEV_I18N = {
     misread: { ja: '誤解', zh: '被误读', en: 'Misread' },
     repost: { ja: 'リポスト価値', zh: '值得转发', en: 'Repost-worthy' },
     bookmark: { ja: '保存価値', zh: '值得收藏', en: 'Bookmark-worthy' },
+    spam: { ja: 'スパム', zh: '垃圾', en: 'Spam' },
     ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
   },
   goal: {
@@ -27,6 +28,7 @@ const JEV_I18N = {
     draftHead: { ja: '投稿前判定 · Jev', zh: '发帖前判定 · Jev', en: 'Pre-post check · Jev' },
     replyHead: { ja: '返信判定（返信先を含めて）· Jev', zh: '回复判定（结合原帖）· Jev', en: 'Reply check (with parent) · Jev' },
     tipGoal: { ja: 'Jev: 私の目的「{g}…」に照らした絡む価値', zh: 'Jev：按我的目的“{g}…”评估的互动价值', en: 'Jev: worth engaging, judged against my goal "{g}…"' },
+    filtered: { ja: 'Jev が非表示: {r}', zh: 'Jev 已过滤：{r}', en: 'Filtered by Jev: {r}' },
     tipGeneric: { ja: 'Jev: この投稿に絡む価値があるかの確率（校正済み）', zh: 'Jev：这条帖子值得互动的概率（已校准）', en: 'Jev: calibrated probability this post is worth engaging with' },
     // options
     optTitle: { ja: 'Jev Tweet Radar 設定', zh: 'Jev Tweet Radar 设置', en: 'Jev Tweet Radar settings' },
@@ -37,6 +39,12 @@ const JEV_I18N = {
     goalNote: { ja: '目的は state.viewer_goal として Jev に渡され、「絡む価値」の質問文が目的基準に切り替わる。他のタグ（バズる・AI臭 など）は目的に関係なく客観判定。', zh: '目的会作为 state.viewer_goal 传给 Jev，“值得互动”的判定标准随之改变。其他标签（会火、AI 味等）与目的无关，客观判定。', en: 'The goal is passed to Jev as state.viewer_goal and the "engage" question is rewritten around it. Other tags (buzz, AI-ish…) are judged objectively regardless of goal.' },
     tagsLabel: { ja: '表示するタグ（絡む価値は常に表示）', zh: '显示的标签（“值得互动”始终显示）', en: 'Tags to show ("engage" is always shown)' },
     tagsNote: { ja: '外したタグは Jev に問い合わせない（token も減る）。変更後は新しく表示されたポストから反映。', zh: '取消的标签不会向 Jev 询问（token 也减少）。修改后对新出现的帖子生效。', en: 'Unchecked tags are not sent to Jev (fewer tokens). Applies to newly shown posts.' },
+    filterLabel: { ja: 'タイムラインのフィルタ（該当ポストを 50% に薄く表示、ホバーで戻る）', zh: '时间线过滤（命中的帖子以 50% 透明度显示，鼠标移上去恢复）', en: 'Timeline filter (matched posts fade to 50%, hover to restore)' },
+    filterOn: { ja: 'フィルタを有効にする', zh: '启用过滤', en: 'Enable filter' },
+    filterRules: { ja: '条件（いずれかに該当で適用）', zh: '条件（满足任一即过滤）', en: 'Rules (any match applies)' },
+    opGe: { ja: '以上', zh: '≥', en: '≥' },
+    opLt: { ja: '未満', zh: '<', en: '<' },
+    filterNote: { ja: '条件に使うタグは表示タグから外していても Jev に問い合わせる。自分の下書きには適用しない。', zh: '条件用到的标签即使未勾选显示也会向 Jev 询问。不作用于自己的草稿。', en: 'Tags used in rules are asked even if not displayed. Never applied to your own drafts.' },
     lang: { ja: '表示言語', zh: '显示语言', en: 'Display language' },
     threshold: { ja: 'タグを強調するしきい値（0–1）', zh: '标签高亮阈值（0–1）', en: 'Highlight threshold (0–1)' },
     maxPerMinute: { ja: '1 分あたりの最大判定数', zh: '每分钟最多判定数', en: 'Max judgments per minute' },

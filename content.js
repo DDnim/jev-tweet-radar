@@ -25,37 +25,20 @@ function extract(article) {
 
 function pct(v) { return v == null ? '–' : Math.round(v * 100) + '%'; }
 
-function render(article, answers, settings) {
+function render(article, answers, settings, filtered) {
   const textEl = article.querySelector('[data-testid="tweetText"]');
   if (!textEl || article.querySelector('.jev-radar')) return;
   const row = buildRow(answers, settings);
   textEl.insertAdjacentElement('afterend', row);
+  if (filtered?.length) applyFilter(article, answers, settings, filtered);
 }
 
-function buildRow(answers, settings) {
+// ---- Timeline filter: a matched post is faded to 50% and comes back on hover. ----
+function applyFilter(article, answers, settings, reasons) {
   const lang = settings.lang || uiLang;
-  const th = settings.threshold ?? 0.5;
-  const row = document.createElement('div');
-  row.className = 'jev-radar';
-  const e = answers.engage;
-  const level = e == null ? 'na' : e >= 0.7 ? 'hi' : e >= th ? 'mid' : 'lo';
-  const main = document.createElement('span');
-  main.className = 'jev-main jev-' + level;
-  main.textContent = `${LABELS.engage[lang]} ${pct(e)}`;
-  main.title = settings.goalText ? JEV_I18N.t('tipGoal', lang, { g: settings.goalText.slice(0, 40) }) : JEV_I18N.t('tipGeneric', lang);
-  row.appendChild(main);
-  for (const k of (settings.tags || ['buzz', 'flame', 'ignored', 'misread', 'ai_smell'])) {
-    const v = answers[k];
-    const chip = document.createElement('span');
-    chip.className = 'jev-chip jev-' + k + (v != null && v >= th ? ' jev-on' : '');
-    chip.textContent = `${LABELS[k][lang]} ${pct(v)}`;
-    row.appendChild(chip);
-  }
-  const foot = document.createElement('span');
-  foot.className = 'jev-foot';
-  foot.textContent = 'Jev';
-  row.appendChild(foot);
-  return row;
+  const reason = reasons.map(k => `${LABELS[k][lang]} ${pct(answers[k])}`).join(' · ');
+  article.classList.add('jev-dim');
+  article.title = JEV_I18N.t('filtered', lang, { r: reason });
 }
 
 // ---- Composer (your own draft): judge after typing pauses, show the same badge row under the textbox. ----
@@ -156,7 +139,7 @@ const io = new IntersectionObserver(entries => {
     if (!post) continue;
     chrome.runtime.sendMessage({ type: 'judge', post }, res => {
       if (chrome.runtime.lastError || !res) return;
-      if (res.answers) render(article, res.answers, res.settings || {});
+      if (res.answers) render(article, res.answers, res.settings || {}, res.filtered);
       else if (res.error === 'no_key') renderNote(article, JEV_I18N.t('noKey', uiLang));
       else if (res.error) renderNote(article, 'Jev: ' + res.error);
       else if (res.skipped === 'rate') { seen.delete?.(article); setTimeout(() => io.observe(article), 15000); }
