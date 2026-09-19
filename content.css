@@ -20,3 +20,7 @@
 }
 .jev-chip.jev-repost.jev-on{background:#0f3d2e;border-color:#1f7a5a}
 .jev-chip.jev-bookmark.jev-on{background:#0f2f3d;border-color:#1f6a7a}
+.jev-draft{margin:6px 0 4px;padding:8px 10px;border:1px dashed #3d444b;border-radius:10px}
+.jev-draft-head{font:11px/1.4 -apple-system,"Hiragino Sans",sans-serif;color:#8b98a5;letter-spacing:.04em;margin-bottom:4px}
+.jev-draft .jev-radar{margin:0}
+@media (prefers-color-scheme: light){.jev-draft{border-color:#cfd9de}}
