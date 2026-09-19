@@ -24,6 +24,7 @@ const JEV_I18N = {
     judging: { ja: '判定中…', zh: '判定中…', en: 'Judging…' },
     noKey: { ja: 'Jev Tweet Radar: API キー未設定（拡張機能のオプションで設定）', zh: 'Jev Tweet Radar：未设置 API key（在扩展选项中设置）', en: 'Jev Tweet Radar: API key not set (open extension options)' },
     noKeyShort: { ja: 'Jev Tweet Radar: API キー未設定', zh: 'Jev Tweet Radar：未设置 API key', en: 'Jev Tweet Radar: API key not set' },
+    reload: { ja: '拡張機能が更新されました。ページを再読み込みしてください', zh: '扩展已更新，请刷新页面', en: 'Extension was updated, please refresh the page' },
     rate: { ja: 'Jev: 判定上限、少し待ってください', zh: 'Jev：已达判定上限，请稍等', en: 'Jev: rate limit reached, please wait' },
     draftHead: { ja: '投稿前判定 · Jev', zh: '发帖前判定 · Jev', en: 'Pre-post check · Jev' },
     replyHead: { ja: '返信判定（返信先を含めて）· Jev', zh: '回复判定（结合原帖）· Jev', en: 'Reply check (with parent) · Jev' },

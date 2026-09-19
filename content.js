@@ -23,6 +23,22 @@ function extract(article) {
   };
 }
 
+// sendMessage that never fails silently: logs to the page console, and after an extension reload
+// (context invalidated) tells the user to refresh the page instead of doing nothing.
+function send(msg, cb) {
+  try {
+    chrome.runtime.sendMessage(msg, res => {
+      const err = chrome.runtime.lastError;
+      if (err) { console.error('[JevRadar] background error:', err.message); return cb(undefined); }
+      if (res?.error) console.warn('[JevRadar]', res.error);
+      cb(res);
+    });
+  } catch (e) {
+    console.error('[JevRadar] extension context lost, refresh the page:', e.message);
+    cb({ error: JEV_I18N.t('reload', uiLang) });
+  }
+}
+
 function pct(v) { return v == null ? '–' : Math.round(v * 100) + '%'; }
 
 function render(article, answers, settings, filtered) {
@@ -105,8 +121,8 @@ function wireComposer(box) {
     renderDraftNote(box, JEV_I18N.t('judging', uiLang));
     const parent = replyTarget(box);
     const post = { id: 'draft:' + hash((parent ? parent.id + '|' : '') + text), author: 'me (draft)', text, time: new Date().toISOString(), hasMedia: false, hasLink: /https?:\/\//.test(text), isReply: !!parent, replyingTo: parent };
-    chrome.runtime.sendMessage({ type: 'judge', post }, res => {
-      if (chrome.runtime.lastError || !res) return;
+    send({ type: 'judge', post }, res => {
+      if (!res) return;
       if (box.innerText.replace(/\u200b/g, '').trim() !== text) return; // stale
       if (res.answers) { draftPanel(box).dataset.reply = parent ? '1' : '0'; renderDraft(box, res.answers, res.settings || {}, text); }
       else if (res.error === 'no_key') renderDraftNote(box, JEV_I18N.t('noKeyShort', uiLang));
@@ -137,8 +153,8 @@ const io = new IntersectionObserver(entries => {
     io.unobserve(article);
     const post = extract(article);
     if (!post) continue;
-    chrome.runtime.sendMessage({ type: 'judge', post }, res => {
-      if (chrome.runtime.lastError || !res) return;
+    send({ type: 'judge', post }, res => {
+      if (!res) return;
       if (res.answers) render(article, res.answers, res.settings || {}, res.filtered);
       else if (res.error === 'no_key') renderNote(article, JEV_I18N.t('noKey', uiLang));
       else if (res.error) renderNote(article, 'Jev: ' + res.error);

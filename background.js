@@ -87,6 +87,7 @@ async function judge(post, settings) {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type !== 'judge') return;
   (async () => {
+   try {
     const settings = await getSettings();
     if (!settings.enabled) return { skipped: 'disabled' };
     if (!settings.apiKey) return { error: 'no_key' };
@@ -99,6 +100,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     const p = judge(msg.post, settings).then(async a => { await remember(k, a); return a; }).finally(() => inflight.delete(k));
     inflight.set(k, p);
     try { return reply(await p); } catch (e) { return { error: String(e.message || e) }; }
+   } catch (e) { console.error('[JevRadar]', e); return { error: String(e.message || e) }; }
   })().then(sendResponse);
   return true;
 });
