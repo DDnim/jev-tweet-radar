@@ -1,5 +1,7 @@
 # Jev Tweet Radar
 
+[English below](#english) · MIT License
+
 X (Twitter) のタイムラインで、画面に入った各ポストを Jev（TypeSafe System One Model）に 1 回だけ問い合わせ、
 **絡む価値** と選択したタグ（バズる / 炎上 / スルー / 誤解 / リポスト価値 / 保存価値 / AI臭）の校正済み確率を本文の下に表示する Chrome 拡張。
 
@@ -16,3 +18,14 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 ## 注意
 - Jev は理由を返さない。確率は「校正済み」だが判定が常に正しいわけではない。
 - 投稿本文は TypeSafe に送信される。
+
+## 投稿前判定
+発言欄（返信欄も）に 8 文字以上入力して 1.2 秒止まると、同じ軸で下書きを採点してツールバーの上に表示する。返信は返信先の投稿を `state.replying_to` として一緒に送り、組み合わせで判定する。
+
+## English
+
+Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Also scores your own draft (and replies, together with the parent post) before you hit Post.
+
+- Load unpacked from `chrome://extensions`, paste your TypeSafe API key in Options, open x.com.
+- One judgment ≈ 300 input tokens ≈ $0.00001; output is free. The popup shows today's count and cost.
+- Jev returns no rationale. Probabilities are calibrated, not infallible. Post text is sent to api.typesafe.ai.
