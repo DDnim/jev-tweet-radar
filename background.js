@@ -53,6 +53,10 @@ async function judge(post, settings) {
     is_reply: post.isReply,
     text: post.text
   };
+  if (post.replyingTo) {
+    state.replying_to = { author: post.replyingTo.author, text: post.replyingTo.text };
+    state.note = 'text は replying_to の投稿への返信の下書き。各質問は返信先との関係（噛み合っているか、文脈が通じるか、相手や周囲がどう受け取るか）を含めて判断する。';
+  }
   const questions = Object.fromEntries(settings.keys.map(k => [k, QUESTIONS[k]]));
   const body = { state, model: settings.model, questions };
   let delay = 800;
