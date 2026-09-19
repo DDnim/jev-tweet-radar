@@ -19,12 +19,15 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 - Jev は理由を返さない。確率は「校正済み」だが判定が常に正しいわけではない。
 - 投稿本文は TypeSafe に送信される。
 
+## 目的プリセット
+オプションの「私の目的」で **フォロワーを増やしたい / 学びたい / 刺激がほしい** を選ぶか、自由記述で目的を書く。目的は `state.viewer_goal` として Jev に渡され、「絡む価値」の質問文が目的基準に切り替わる（他のタグは客観判定のまま）。目的ごとにキャッシュは別。
+
 ## 投稿前判定
 発言欄（返信欄も）に 8 文字以上入力して 1.2 秒止まると、同じ軸で下書きを採点してツールバーの上に表示する。返信は返信先の投稿を `state.replying_to` として一緒に送り、組み合わせで判定する。
 
 ## English
 
-Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Also scores your own draft (and replies, together with the parent post) before you hit Post.
+Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
 
 - Load unpacked from `chrome://extensions`, paste your TypeSafe API key in Options, open x.com.
 - One judgment ≈ 300 input tokens ≈ $0.00001; output is free. The popup shows today's count and cost.

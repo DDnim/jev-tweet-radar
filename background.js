@@ -1,7 +1,7 @@
-import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS } from './questions.js';
+import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor } from './questions.js';
 
 const API = 'https://api.typesafe.ai/v1/systemone';
-const DEFAULTS = { apiKey: '', enabled: true, lang: 'ja', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS };
+const DEFAULTS = { apiKey: '', enabled: true, lang: 'ja', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '' };
 const MEM_CACHE = new Map(); // tweetId → answers (per service-worker lifetime; persistent cache lives in chrome.storage.local)
 const inflight = new Map();
 let windowStart = Date.now(), windowCount = 0;
@@ -11,9 +11,11 @@ async function getSettings() {
   const merged = { ...DEFAULTS, ...s };
   merged.tags = TAG_ORDER.filter(t => merged.tags.includes(t));
   merged.keys = ['engage', ...merged.tags];
+  merged.goalText = merged.goalPreset === 'custom' ? (merged.goalCustom || '').trim() : (GOALS[merged.goalPreset]?.text || '');
   return merged;
 }
-const cacheKey = (id, settings) => 'r:' + id + ':' + settings.keys.join(',');
+function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+const cacheKey = (id, settings) => 'r:' + id + ':' + settings.keys.join(',') + (settings.goalText ? ':g' + hash(settings.goalText) : '');
 
 async function cached(k) {
   if (MEM_CACHE.has(k)) return MEM_CACHE.get(k);
@@ -57,7 +59,8 @@ async function judge(post, settings) {
     state.replying_to = { author: post.replyingTo.author, text: post.replyingTo.text };
     state.note = 'text は replying_to の投稿への返信の下書き。各質問は返信先との関係（噛み合っているか、文脈が通じるか、相手や周囲がどう受け取るか）を含めて判断する。';
   }
-  const questions = Object.fromEntries(settings.keys.map(k => [k, QUESTIONS[k]]));
+  if (settings.goalText) state.viewer_goal = settings.goalText;
+  const questions = Object.fromEntries(settings.keys.map(k => [k, k === 'engage' ? engageFor(settings.goalText) : QUESTIONS[k]]));
   const body = { state, model: settings.model, questions };
   let delay = 800;
   for (let attempt = 0; attempt < 4; attempt++) {

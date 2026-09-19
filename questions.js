@@ -54,3 +54,29 @@ export const LABELS = {
 // Selectable tags in display order; `engage` is always asked and shown as the main badge.
 export const TAG_ORDER = ['buzz', 'flame', 'ignored', 'misread', 'repost', 'bookmark', 'ai_smell'];
 export const DEFAULT_TAGS = ['buzz', 'misread', 'repost', 'bookmark', 'ai_smell'];
+
+// Viewer goal presets. The goal is placed in `state.viewer_goal` and rewrites the `engage` question so
+// "worth engaging" is judged relative to what the viewer wants; other tags stay objective.
+export const GOALS = {
+  grow: {
+    label: { ja: 'フォロワーを増やしたい', zh: '我主要想涨粉', en: 'Grow followers' },
+    text: 'フォロワーを増やしたい。影響力のある人や伸びている話題に、自分が価値を足せる返信・引用で絡み、露出とフォローにつなげたい。'
+  },
+  learn: {
+    label: { ja: '学びたい', zh: '我主要想学习', en: 'Learn' },
+    text: '学びたい。新しい知識、一次情報、具体的な経験談、深い議論のある投稿に絡んで理解を深めたい。反応稼ぎや薄い話題には興味がない。'
+  },
+  thrill: {
+    label: { ja: '刺激がほしい', zh: '我想找些刺激', en: 'Looking for excitement' },
+    text: '刺激がほしい。意外な主張、挑発的な論点、白熱している議論、思わず反応したくなる面白い投稿に絡みたい。'
+  },
+  custom: { label: { ja: '自分で書く', zh: '自定义', en: 'Custom' }, text: '' }
+};
+export function engageFor(goalText) {
+  if (!goalText) return QUESTIONS.engage;
+  return {
+    type: 'noul',
+    instructions: `viewer_goal は私（読み手）の目的。その目的にとって、この投稿は返信や引用で絡む価値があるか？ スパム・宣伝・bot・内容のない反応は目的にかかわらず価値なし。目的: ${goalText}`,
+    criteria: { true: '私の目的に照らして絡む価値がある', false: '私の目的に照らして絡む価値がない、またはスパム・宣伝・bot' }
+  };
+}

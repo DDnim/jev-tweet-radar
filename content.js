@@ -47,7 +47,7 @@ function buildRow(answers, settings) {
   const main = document.createElement('span');
   main.className = 'jev-main jev-' + level;
   main.textContent = `${LABELS.engage[lang]} ${pct(e)}`;
-  main.title = 'Jev: この投稿に絡む価値があるかの確率（校正済み）';
+  main.title = settings.goalText ? 'Jev: 私の目的「' + settings.goalText.slice(0, 40) + '…」に照らした絡む価値' : 'Jev: この投稿に絡む価値があるかの確率（校正済み）';
   row.appendChild(main);
   for (const k of (settings.tags || ['buzz', 'flame', 'ignored', 'misread', 'ai_smell'])) {
     const v = answers[k];
