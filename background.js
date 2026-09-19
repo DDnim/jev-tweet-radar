@@ -1,7 +1,7 @@
 import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor } from './questions.js';
 
 const API = 'https://api.typesafe.ai/v1/systemone';
-const DEFAULTS = { apiKey: '', enabled: true, lang: 'ja', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '' };
+const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '' };
 const MEM_CACHE = new Map(); // tweetId → answers (per service-worker lifetime; persistent cache lives in chrome.storage.local)
 const inflight = new Map();
 let windowStart = Date.now(), windowCount = 0;

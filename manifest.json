@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Jev Tweet Radar",
   "version": "0.1.0",
-  "description": "タイムラインの各ポストを Jev（System One Model）が 1 回の判定で採点：絡む価値 / バズる / 炎上 / スルー / 誤解 / AI臭",
+  "description": "Jev scores every post on X: worth engaging, buzz, misread, AI-ish… / X のポストを Jev が採点 / 用 Jev 给每条推文打分",
   "permissions": [
     "storage"
   ],
@@ -20,6 +20,7 @@
         "https://twitter.com/*"
       ],
       "js": [
+        "i18n.js",
         "content.js"
       ],
       "css": [

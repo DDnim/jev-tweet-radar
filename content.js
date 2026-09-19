@@ -1,15 +1,10 @@
 // Scans the X timeline, asks the background worker to judge each post once it is visible, and renders a badge row.
-const LABELS = {
-  engage: { ja: '絡む価値', zh: '值得互动', en: 'Engage' },
-  buzz: { ja: 'バズる', zh: '会火', en: 'Buzz' },
-  flame: { ja: '炎上', zh: '炎上', en: 'Flame' },
-  ignored: { ja: 'スルー', zh: '无人理', en: 'Ignored' },
-  misread: { ja: '誤解', zh: '被误读', en: 'Misread' },
-  repost: { ja: 'リポスト価値', zh: '值得转发', en: 'Repost-worthy' },
-  bookmark: { ja: '保存価値', zh: '值得收藏', en: 'Bookmark-worthy' },
-  ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
-};
+const LABELS = JEV_I18N.tag;
 const seen = new WeakSet();
+// UI language for messages shown before a judgment result (which carries settings.lang) arrives.
+let uiLang = JEV_I18N.detect();
+chrome.storage.sync.get({ lang: '' }, s => { if (s.lang) uiLang = s.lang; });
+chrome.storage.onChanged.addListener((c, area) => { if (area === 'sync' && c.lang?.newValue) uiLang = c.lang.newValue; });
 
 function extract(article) {
   const link = [...article.querySelectorAll('a[href*="/status/"]')].map(a => a.getAttribute('href')).find(h => /\/status\/\d+$/.test(h));
@@ -38,7 +33,7 @@ function render(article, answers, settings) {
 }
 
 function buildRow(answers, settings) {
-  const lang = settings.lang || 'ja';
+  const lang = settings.lang || uiLang;
   const th = settings.threshold ?? 0.5;
   const row = document.createElement('div');
   row.className = 'jev-radar';
@@ -47,7 +42,7 @@ function buildRow(answers, settings) {
   const main = document.createElement('span');
   main.className = 'jev-main jev-' + level;
   main.textContent = `${LABELS.engage[lang]} ${pct(e)}`;
-  main.title = settings.goalText ? 'Jev: 私の目的「' + settings.goalText.slice(0, 40) + '…」に照らした絡む価値' : 'Jev: この投稿に絡む価値があるかの確率（校正済み）';
+  main.title = settings.goalText ? JEV_I18N.t('tipGoal', lang, { g: settings.goalText.slice(0, 40) }) : JEV_I18N.t('tipGeneric', lang);
   row.appendChild(main);
   for (const k of (settings.tags || ['buzz', 'flame', 'ignored', 'misread', 'ai_smell'])) {
     const v = answers[k];
@@ -89,7 +84,7 @@ function renderDraft(box, answers, settings, text) {
   const head = document.createElement('div');
   head.className = 'jev-draft-head';
   const isReply = panel.dataset.reply === '1';
-  head.textContent = settings.lang === 'zh' ? (isReply ? '回复判定（结合原帖）· Jev' : '发帖前判定 · Jev') : settings.lang === 'en' ? (isReply ? 'Reply check (with parent) · Jev' : 'Pre-post check · Jev') : (isReply ? '返信判定（返信先を含めて）· Jev' : '投稿前判定 · Jev');
+  head.textContent = JEV_I18N.t(isReply ? 'replyHead' : 'draftHead', settings.lang || uiLang);
   panel.appendChild(head);
   const row = buildRow(answers, settings);
   panel.appendChild(row);
@@ -124,16 +119,16 @@ function wireComposer(box) {
     if (text.length < DRAFT_MIN) { panels.get(box)?.remove(); last = ''; return; }
     if (text === last) return;
     last = text;
-    renderDraftNote(box, '判定中…');
+    renderDraftNote(box, JEV_I18N.t('judging', uiLang));
     const parent = replyTarget(box);
     const post = { id: 'draft:' + hash((parent ? parent.id + '|' : '') + text), author: 'me (draft)', text, time: new Date().toISOString(), hasMedia: false, hasLink: /https?:\/\//.test(text), isReply: !!parent, replyingTo: parent };
     chrome.runtime.sendMessage({ type: 'judge', post }, res => {
       if (chrome.runtime.lastError || !res) return;
       if (box.innerText.replace(/\u200b/g, '').trim() !== text) return; // stale
       if (res.answers) { draftPanel(box).dataset.reply = parent ? '1' : '0'; renderDraft(box, res.answers, res.settings || {}, text); }
-      else if (res.error === 'no_key') renderDraftNote(box, 'Jev Tweet Radar: API キー未設定');
+      else if (res.error === 'no_key') renderDraftNote(box, JEV_I18N.t('noKeyShort', uiLang));
       else if (res.error) renderDraftNote(box, 'Jev: ' + res.error);
-      else if (res.skipped === 'rate') renderDraftNote(box, 'Jev: 判定上限、少し待ってください');
+      else if (res.skipped === 'rate') renderDraftNote(box, JEV_I18N.t('rate', uiLang));
     });
   };
   box.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(run, DRAFT_DEBOUNCE); });
@@ -162,7 +157,7 @@ const io = new IntersectionObserver(entries => {
     chrome.runtime.sendMessage({ type: 'judge', post }, res => {
       if (chrome.runtime.lastError || !res) return;
       if (res.answers) render(article, res.answers, res.settings || {});
-      else if (res.error === 'no_key') renderNote(article, 'Jev Tweet Radar: API キー未設定（拡張機能のオプションで設定）');
+      else if (res.error === 'no_key') renderNote(article, JEV_I18N.t('noKey', uiLang));
       else if (res.error) renderNote(article, 'Jev: ' + res.error);
       else if (res.skipped === 'rate') { seen.delete?.(article); setTimeout(() => io.observe(article), 15000); }
     });

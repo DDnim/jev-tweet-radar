@@ -1,0 +1,57 @@
+// UI strings for ja / zh / en. Plain script (not a module) so content scripts, options and popup can all share it.
+const JEV_I18N = {
+  langs: { ja: '日本語', zh: '中文', en: 'English' },
+  detect() { const l = (navigator.language || 'en').toLowerCase(); return l.startsWith('ja') ? 'ja' : l.startsWith('zh') ? 'zh' : 'en'; },
+  tag: {
+    engage: { ja: '絡む価値', zh: '值得互动', en: 'Engage' },
+    buzz: { ja: 'バズる', zh: '会火', en: 'Buzz' },
+    flame: { ja: '炎上', zh: '炎上', en: 'Flame' },
+    ignored: { ja: 'スルー', zh: '无人理', en: 'Ignored' },
+    misread: { ja: '誤解', zh: '被误读', en: 'Misread' },
+    repost: { ja: 'リポスト価値', zh: '值得转发', en: 'Repost-worthy' },
+    bookmark: { ja: '保存価値', zh: '值得收藏', en: 'Bookmark-worthy' },
+    ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
+  },
+  goal: {
+    none: { ja: '指定しない（一般的な「絡む価値」）', zh: '不指定（通用的“值得互动”）', en: 'None (generic "worth engaging")' },
+    grow: { ja: 'フォロワーを増やしたい', zh: '我主要想涨粉', en: 'Grow followers' },
+    learn: { ja: '学びたい', zh: '我主要想学习', en: 'Learn' },
+    thrill: { ja: '刺激がほしい', zh: '我想找点刺激', en: 'Looking for excitement' },
+    custom: { ja: '自分で書く', zh: '自定义', en: 'Custom' }
+  },
+  ui: {
+    judging: { ja: '判定中…', zh: '判定中…', en: 'Judging…' },
+    noKey: { ja: 'Jev Tweet Radar: API キー未設定（拡張機能のオプションで設定）', zh: 'Jev Tweet Radar：未设置 API key（在扩展选项中设置）', en: 'Jev Tweet Radar: API key not set (open extension options)' },
+    noKeyShort: { ja: 'Jev Tweet Radar: API キー未設定', zh: 'Jev Tweet Radar：未设置 API key', en: 'Jev Tweet Radar: API key not set' },
+    rate: { ja: 'Jev: 判定上限、少し待ってください', zh: 'Jev：已达判定上限，请稍等', en: 'Jev: rate limit reached, please wait' },
+    draftHead: { ja: '投稿前判定 · Jev', zh: '发帖前判定 · Jev', en: 'Pre-post check · Jev' },
+    replyHead: { ja: '返信判定（返信先を含めて）· Jev', zh: '回复判定（结合原帖）· Jev', en: 'Reply check (with parent) · Jev' },
+    tipGoal: { ja: 'Jev: 私の目的「{g}…」に照らした絡む価値', zh: 'Jev：按我的目的“{g}…”评估的互动价值', en: 'Jev: worth engaging, judged against my goal "{g}…"' },
+    tipGeneric: { ja: 'Jev: この投稿に絡む価値があるかの確率（校正済み）', zh: 'Jev：这条帖子值得互动的概率（已校准）', en: 'Jev: calibrated probability this post is worth engaging with' },
+    // options
+    optTitle: { ja: 'Jev Tweet Radar 設定', zh: 'Jev Tweet Radar 设置', en: 'Jev Tweet Radar settings' },
+    apiKey: { ja: 'TypeSafe API キー', zh: 'TypeSafe API key', en: 'TypeSafe API key' },
+    apiKeyNote: { ja: 'ブラウザ内（chrome.storage.sync）にのみ保存。投稿本文は api.typesafe.ai へ送信されます。', zh: '仅保存在浏览器内（chrome.storage.sync）。帖子正文会发送到 api.typesafe.ai。', en: 'Stored only in your browser (chrome.storage.sync). Post text is sent to api.typesafe.ai.' },
+    goalLabel: { ja: '私の目的（「絡む価値」の基準になります）', zh: '我的目的（决定“值得互动”的标准）', en: 'My goal (defines what "worth engaging" means)' },
+    goalPh: { ja: '例：日本語で AI の話をする人と知り合いたい。英語の投稿は不要。', zh: '例：想认识用中文聊 AI 的人，不需要英文帖子。', en: 'e.g. I want to meet people discussing AI in English. Skip promotional posts.' },
+    goalNote: { ja: '目的は state.viewer_goal として Jev に渡され、「絡む価値」の質問文が目的基準に切り替わる。他のタグ（バズる・AI臭 など）は目的に関係なく客観判定。', zh: '目的会作为 state.viewer_goal 传给 Jev，“值得互动”的判定标准随之改变。其他标签（会火、AI 味等）与目的无关，客观判定。', en: 'The goal is passed to Jev as state.viewer_goal and the "engage" question is rewritten around it. Other tags (buzz, AI-ish…) are judged objectively regardless of goal.' },
+    tagsLabel: { ja: '表示するタグ（絡む価値は常に表示）', zh: '显示的标签（“值得互动”始终显示）', en: 'Tags to show ("engage" is always shown)' },
+    tagsNote: { ja: '外したタグは Jev に問い合わせない（token も減る）。変更後は新しく表示されたポストから反映。', zh: '取消的标签不会向 Jev 询问（token 也减少）。修改后对新出现的帖子生效。', en: 'Unchecked tags are not sent to Jev (fewer tokens). Applies to newly shown posts.' },
+    lang: { ja: '表示言語', zh: '显示语言', en: 'Display language' },
+    threshold: { ja: 'タグを強調するしきい値（0–1）', zh: '标签高亮阈值（0–1）', en: 'Highlight threshold (0–1)' },
+    maxPerMinute: { ja: '1 分あたりの最大判定数', zh: '每分钟最多判定数', en: 'Max judgments per minute' },
+    maxNote: { ja: '1 判定 ≈ 300 token ≈ $0.00001。120/分でも 1 時間 $0.1 未満。', zh: '1 次判定 ≈ 300 token ≈ $0.00001。即使 120/分钟，1 小时也不到 $0.1。', en: '1 judgment ≈ 300 tokens ≈ $0.00001. Even at 120/min, under $0.1 per hour.' },
+    enabled: { ja: '有効', zh: '启用', en: 'Enabled' },
+    save: { ja: '保存', zh: '保存', en: 'Save' },
+    saved: { ja: '保存しました', zh: '已保存', en: 'Saved' },
+    clear: { ja: '判定キャッシュを消去', zh: '清除判定缓存', en: 'Clear judgment cache' },
+    cleared: { ja: 'キャッシュを消去しました', zh: '缓存已清除', en: 'Cache cleared' },
+    // popup
+    today: { ja: '今日の判定', zh: '今日判定', en: 'Today' },
+    calls: { ja: '件', zh: '次', en: 'calls' },
+    approx: { ja: '概算', zh: '约', en: 'approx.' },
+    total: { ja: '累計 {n} 件', zh: '累计 {n} 次', en: '{n} total' },
+    openOpt: { ja: '設定を開く', zh: '打开设置', en: 'Open settings' }
+  },
+  t(key, lang, vars = {}) { const s = (this.ui[key] || {})[lang] || (this.ui[key] || {}).en || key; return s.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? ''); }
+};
