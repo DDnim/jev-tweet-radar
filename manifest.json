@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Jev Tweet Radar",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Jev scores every post on X: worth engaging, buzz, misread, AI-ish… / X のポストを Jev が採点 / 用 Jev 给每条推文打分",
   "permissions": [
     "storage"

@@ -5,7 +5,7 @@
 UI は日本語 / 中文 / English（ブラウザ言語で自動、設定で変更可）。
 
 X (Twitter) のタイムラインで、画面に入った各ポストを Jev（TypeSafe System One Model）に 1 回だけ問い合わせ、
-**絡む価値** と選択したタグ（スパム / バズる / 炎上 / スルー / 誤解 / リポスト価値 / 保存価値 / AI臭）の校正済み確率を本文の下に表示する Chrome 拡張。
+**絡む価値**・**バズる** などの校正済み確率を、アバター列（縦バー・レア度の背景）で表示する Chrome 拡張。本文の下にはタグを出さない（下書き判定のみタグ行を出す）。
 
 ## インストール
 1. `chrome://extensions` → 右上「デベロッパーモード」ON → 「パッケージ化されていない拡張機能を読み込む」でこのフォルダを選択。
@@ -36,7 +36,7 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 
 ## English
 
-Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *spam / buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities. Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
+Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *spam / buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities, shown in the avatar column (vertical bars + rarity tint); no badge row under the post text (drafts still get one). Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
 
 - Timeline filter: rules such as *spam ≥ 0.7* or *engage < 0.3* fade matched posts to 50% opacity; hover restores them.
 - Under the avatar: two thin vertical bars (buzz / engage). The avatar column gets a rarity tint from the higher one: >75% gold, >60% purple, >45% green, else white. Long-press the column 0.6 s to bookmark + repost + like at once (it shakes while held; never undoes). Posts over 85% spam or AI-ish fold to the name line (click to expand); on those, the long press blocks the author instead.
@@ -47,7 +47,7 @@ Chrome extension (MV3) that scores every post on your X timeline with **one** ca
 
 ## 中文
 
-Chrome 扩展（MV3）。刷 X 时间线时，对进入视野的每条帖子只向 [Jev](https://typesafe.ai)（TypeSafe System One Model）发一次请求，在正文下方显示 **值得互动** 和你勾选的标签（垃圾 / 会火 / 炎上 / 无人理 / 被误读 / 值得转发 / 值得收藏 / AI 味）的校准概率。可选目的（涨粉 / 学习 / 找刺激 / 自定义），“值得互动”会按该目的判定。你自己的草稿（以及回复，会连同原帖一起）在点发送之前也会被判定。
+Chrome 扩展（MV3）。刷 X 时间线时，对进入视野的每条帖子只向 [Jev](https://typesafe.ai)（TypeSafe System One Model）发一次请求，用头像列（竖条 + 稀有度底色）显示 **值得互动**、**会火** 等校准概率，正文下方不再显示标签（仅发帖前判定仍显示标签行）。可选目的（涨粉 / 学习 / 找刺激 / 自定义），“值得互动”会按该目的判定。你自己的草稿（以及回复，会连同原帖一起）在点发送之前也会被判定。
 
 - 时间线过滤：设置条件（如 垃圾 ≥ 0.7、值得互动 < 0.3），命中的帖子以 50% 透明度显示，鼠标移上去恢复。
 - 头像下方显示「会火」（橙）和「值得互动」（蓝）两条细竖条；头像列按较高的那个值上稀有度底色：>75% 金色传说、>60% 紫色史诗、>45% 绿色稀有，其余白色。长按头像列 0.6 秒一键三连（收藏＋转发＋点赞，按住时抖动，已做的不会取消）。垃圾或 AI 味超过 85% 的帖子折叠成只剩名字一行（点击展开），这时长按改为屏蔽作者。
