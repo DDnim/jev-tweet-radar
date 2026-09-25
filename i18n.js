@@ -31,6 +31,8 @@ const JEV_I18N = {
     tipGoal: { ja: 'Jev: 私の目的「{g}…」に照らした絡む価値', zh: 'Jev：按我的目的“{g}…”评估的互动价值', en: 'Jev: worth engaging, judged against my goal "{g}…"' },
     filtered: { ja: 'Jev が非表示: {r}', zh: 'Jev 已过滤：{r}', en: 'Filtered by Jev: {r}' },
     tipGeneric: { ja: 'Jev: この投稿に絡む価値があるかの確率（校正済み）', zh: 'Jev：这条帖子值得互动的概率（已校准）', en: 'Jev: calibrated probability this post is worth engaging with' },
+    rarity: { ja: '{r} · バズる {b} · 絡む価値 {e}\n長押しでブックマーク＋リポスト＋いいね', zh: '{r} · 会火 {b} · 值得互动 {e}\n长按一键三连（收藏＋转发＋点赞）', en: '{r} · Buzz {b} · Engage {e}\nLong-press: bookmark + repost + like' },
+    rarityName: { ja: { gold: 'レジェンド', purple: 'エピック', green: 'レア', white: 'コモン' }, zh: { gold: '金色传说', purple: '紫色史诗', green: '绿色稀有', white: '普通' }, en: { gold: 'Legendary', purple: 'Epic', green: 'Rare', white: 'Common' } },
     // options
     optTitle: { ja: 'Jev Tweet Radar 設定', zh: 'Jev Tweet Radar 设置', en: 'Jev Tweet Radar settings' },
     apiKey: { ja: 'TypeSafe API キー', zh: 'TypeSafe API key', en: 'TypeSafe API key' },

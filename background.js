@@ -13,7 +13,8 @@ async function getSettings() {
   merged.filter = { ...DEFAULT_FILTER, ...(merged.filter || {}), rules: { ...DEFAULT_FILTER.rules, ...(merged.filter?.rules || {}) } };
   // Tags a live filter rule needs are asked too, even when hidden from the badge row.
   const ruleTags = !merged.filter.on ? [] : Object.entries(merged.filter.rules).filter(([, r]) => r.on).map(([t]) => t);
-  merged.keys = ['engage', ...TAG_ORDER.filter(t => merged.tags.includes(t) || ruleTags.includes(t))];
+  // `buzz` is always asked: the bars under the avatar and the rarity colour use it.
+  merged.keys = ['engage', ...TAG_ORDER.filter(t => t === 'buzz' || merged.tags.includes(t) || ruleTags.includes(t))];
   merged.goalText = merged.goalPreset === 'custom' ? (merged.goalCustom || '').trim() : (GOALS[merged.goalPreset]?.text || '');
   return merged;
 }
