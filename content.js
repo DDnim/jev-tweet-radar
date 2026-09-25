@@ -70,7 +70,9 @@ function decorateAvatar(article, answers, settings) {
   const lang = settings.lang || uiLang;
   const rarity = rarityOf(answers);
   const bars = document.createElement('div');
-  bars.className = 'jev-bars';
+  // The open post on a detail page has its avatar in the header row, so its bars lie flat instead of standing up.
+  const focal = (location.pathname.match(/\/status\/(\d+)/) || [])[1];
+  bars.className = 'jev-bars' + (focal && extract(article)?.id === focal ? ' jev-bars-flat' : '');
   for (const k of ['buzz', 'engage']) {
     const bar = document.createElement('div');
     bar.className = 'jev-bar jev-bar-' + k;

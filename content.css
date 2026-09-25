@@ -42,6 +42,9 @@
 .jev-bars{display:flex;justify-content:center;gap:4px;height:28px;margin:4px auto 0}
 .jev-bar{width:4px;border-radius:2px;background:rgba(139,152,165,.25);overflow:hidden;position:relative}
 .jev-bar::after{content:"";position:absolute;inset:auto 0 0 0;height:var(--v);border-radius:2px}
+.jev-bars-flat{flex-direction:column;gap:2px;width:32px;height:auto}
+.jev-bars-flat .jev-bar{width:auto;height:3px}
+.jev-bars-flat .jev-bar::after{inset:0 auto 0 0;width:var(--v);height:auto}
 .jev-bar-buzz::after{background:#ff7a45}
 .jev-bar-engage::after{background:#1d9bf0}
 .jev-hold{animation:jev-shake .12s linear infinite}
