@@ -50,7 +50,7 @@ function render(article, answers, settings, filtered) {
   if (filtered?.length) applyFilter(article, answers, settings, filtered);
 }
 
-// ---- Avatar column: two tiny bars (buzz / engage), a rarity background, and long-press "triple" (bookmark + repost + like). ----
+// ---- Avatar column: two tiny bars (buzz / engage), a rarity background, and a long press ("triple" = bookmark + repost + like, or block on junk). ----
 function rarityOf(answers) {
   const v = Math.max(answers.buzz ?? 0, answers.engage ?? 0);
   return v > 0.75 ? 'gold' : v > 0.6 ? 'purple' : v > 0.45 ? 'green' : 'white';
@@ -81,19 +81,57 @@ function decorateAvatar(article, answers, settings) {
   }
   avatar.insertAdjacentElement('afterend', bars);
   col.classList.add('jev-col', 'jev-r-' + rarity);
-  col.title = JEV_I18N.t('rarity', lang, { r: JEV_I18N.ui.rarityName[lang]?.[rarity] || rarity, b: pct(answers.buzz), e: pct(answers.engage) });
-  wireTriple(article, col);
+  const author = extract(article)?.author || '';
+  const junk = junkReasons(answers);
+  const tip = JEV_I18N.t('rarity', lang, { r: JEV_I18N.ui.rarityName[lang]?.[rarity] || rarity, b: pct(answers.buzz), e: pct(answers.engage) });
+  col.title = junk.length ? JEV_I18N.t('rarityBlock', lang, { r: tip.split('\n')[0], u: author }) : tip;
+  if (junk.length) fold(article, col, junk.map(k => `${LABELS[k][lang]} ${pct(answers[k])}`).join(' · '), lang, author);
+  wireLongPress(article, col, junk.length ? () => block(article) : () => triple(article, col));
+}
+
+// ---- Junk (spam / AI-ish over 85%): fold the post down to its header line; long-press on the avatar blocks the author. ----
+const JUNK_AT = 0.85;
+function junkReasons(answers) { return ['spam', 'ai_smell'].filter(k => answers[k] != null && answers[k] > JUNK_AT); }
+
+// Hides every child of the content column except the one holding the name/handle line, and puts a one-line note there instead.
+function fold(article, col, reason, lang, author) {
+  const body = col.nextElementSibling;
+  const head = body && [...body.children].find(c => c.querySelector('[data-testid="User-Name"]'));
+  if (!head) return;
+  const hidden = [...body.children].filter(c => c !== head);
+  hidden.forEach(c => c.classList.add('jev-fold-hide'));
+  article.classList.add('jev-folded');
+  const note = document.createElement('div');
+  note.className = 'jev-fold-note';
+  note.textContent = JEV_I18N.t('folded', lang, { r: reason, u: author });
+  note.addEventListener('click', e => {
+    e.preventDefault(); e.stopPropagation();
+    hidden.forEach(c => c.classList.remove('jev-fold-hide'));
+    article.classList.remove('jev-folded');
+    note.remove();
+  });
+  head.insertAdjacentElement('afterend', note);
+}
+
+// X's own flow: "…" menu → Block → confirm.
+async function block(article) {
+  article.querySelector('[data-testid="caret"]')?.click();
+  const item = await waitFor('[data-testid="block"]') ||
+    [...document.querySelectorAll('[role="menuitem"]')].find(m => /Block|ブロック|屏蔽|封锁|封鎖/.test(m.textContent) && !/Unblock|解除|取消/.test(m.textContent));
+  if (!item) { document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return; }
+  item.click();
+  (await waitFor('[data-testid="confirmationSheetConfirm"]'))?.click();
 }
 
 const HOLD_MS = 600;
-function wireTriple(article, col) {
+function wireLongPress(article, col, action) {
   let timer = null, fired = false;
   const cancel = () => { clearTimeout(timer); timer = null; col.classList.remove('jev-hold'); };
   col.addEventListener('pointerdown', e => {
     if (e.button !== 0) return;
     fired = false;
     col.classList.add('jev-hold');
-    timer = setTimeout(() => { timer = null; fired = true; col.classList.remove('jev-hold'); triple(article, col); }, HOLD_MS);
+    timer = setTimeout(() => { timer = null; fired = true; col.classList.remove('jev-hold'); col.classList.remove('jev-boom'); void col.offsetWidth; col.classList.add('jev-boom'); action(); }, HOLD_MS);
   });
   for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) col.addEventListener(ev, cancel);
   // A completed long press must not also open the author's profile.
@@ -110,7 +148,6 @@ async function waitFor(sel, ms = 1500) {
 
 // Only turns things on: an already-liked / reposted / bookmarked post is left as is.
 async function triple(article, col) {
-  col.classList.remove('jev-boom'); void col.offsetWidth; col.classList.add('jev-boom');
   const q = sel => article.querySelector(sel);
   q('[data-testid="bookmark"]')?.click();
   await sleep(150);

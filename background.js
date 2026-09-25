@@ -2,6 +2,7 @@ import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor, DEFAULT_FILTER, f
 
 const API = 'https://api.typesafe.ai/v1/systemone';
 const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER };
+const ALWAYS = ['buzz', 'spam', 'ai_smell'];
 const MEM_CACHE = new Map(); // tweetId → answers (per service-worker lifetime; persistent cache lives in chrome.storage.local)
 const inflight = new Map();
 let windowStart = Date.now(), windowCount = 0;
@@ -13,8 +14,8 @@ async function getSettings() {
   merged.filter = { ...DEFAULT_FILTER, ...(merged.filter || {}), rules: { ...DEFAULT_FILTER.rules, ...(merged.filter?.rules || {}) } };
   // Tags a live filter rule needs are asked too, even when hidden from the badge row.
   const ruleTags = !merged.filter.on ? [] : Object.entries(merged.filter.rules).filter(([, r]) => r.on).map(([t]) => t);
-  // `buzz` is always asked: the bars under the avatar and the rarity colour use it.
-  merged.keys = ['engage', ...TAG_ORDER.filter(t => t === 'buzz' || merged.tags.includes(t) || ruleTags.includes(t))];
+  // Always asked: `buzz` for the bars under the avatar and the rarity colour, `spam` / `ai_smell` for folding.
+  merged.keys = ['engage', ...TAG_ORDER.filter(t => ALWAYS.includes(t) || merged.tags.includes(t) || ruleTags.includes(t))];
   merged.goalText = merged.goalPreset === 'custom' ? (merged.goalCustom || '').trim() : (GOALS[merged.goalPreset]?.text || '');
   return merged;
 }
