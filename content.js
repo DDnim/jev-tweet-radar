@@ -41,11 +41,9 @@ function send(msg, cb) {
 
 function pct(v) { return v == null ? '–' : Math.round(v * 100) + '%'; }
 
+// Timeline posts show the result only in the avatar column (no badge row under the text); drafts still get the row.
 function render(article, answers, settings, filtered) {
-  const textEl = article.querySelector('[data-testid="tweetText"]');
-  if (!textEl || article.querySelector('.jev-radar')) return;
-  const row = buildRow(answers, settings);
-  textEl.insertAdjacentElement('afterend', row);
+  if (article.querySelector('.jev-col')) return;
   decorateAvatar(article, answers, settings);
   if (filtered?.length) applyFilter(article, answers, settings, filtered);
 }
@@ -163,11 +161,6 @@ function applyFilter(article, answers, settings, reasons) {
   const reason = reasons.map(k => `${LABELS[k][lang]} ${pct(answers[k])}`).join(' · ');
   article.classList.add('jev-dim');
   article.title = JEV_I18N.t('filtered', lang, { r: reason });
-  // Show why, in the badge row, so a rule on a hidden tag (e.g. "ignored") is not a mystery.
-  const why = document.createElement('span');
-  why.className = 'jev-why';
-  why.textContent = JEV_I18N.t('filtered', lang, { r: reason });
-  article.querySelector('.jev-radar')?.insertBefore(why, article.querySelector('.jev-foot'));
 }
 
 function buildRow(answers, settings) {
