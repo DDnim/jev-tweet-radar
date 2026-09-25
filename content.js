@@ -46,7 +46,78 @@ function render(article, answers, settings, filtered) {
   if (!textEl || article.querySelector('.jev-radar')) return;
   const row = buildRow(answers, settings);
   textEl.insertAdjacentElement('afterend', row);
+  decorateAvatar(article, answers, settings);
   if (filtered?.length) applyFilter(article, answers, settings, filtered);
+}
+
+// ---- Avatar column: two tiny bars (buzz / engage), a rarity background, and long-press "triple" (bookmark + repost + like). ----
+function rarityOf(answers) {
+  const v = Math.max(answers.buzz ?? 0, answers.engage ?? 0);
+  return v > 0.75 ? 'gold' : v > 0.6 ? 'purple' : v > 0.45 ? 'green' : 'white';
+}
+
+// The left column holding the avatar: the highest ancestor of the avatar that is still narrow (X gives it a fixed ~40px width).
+function avatarColumn(article) {
+  const avatar = article.querySelector('[data-testid="Tweet-User-Avatar"]');
+  if (!avatar) return null;
+  let col = avatar;
+  while (col.parentElement && col.parentElement !== article && col.parentElement.getBoundingClientRect().width < 80) col = col.parentElement;
+  return { avatar, col };
+}
+
+function decorateAvatar(article, answers, settings) {
+  const found = avatarColumn(article);
+  if (!found || found.col.classList.contains('jev-col')) return;
+  const { avatar, col } = found;
+  const lang = settings.lang || uiLang;
+  const rarity = rarityOf(answers);
+  const bars = document.createElement('div');
+  bars.className = 'jev-bars';
+  for (const k of ['buzz', 'engage']) {
+    const bar = document.createElement('div');
+    bar.className = 'jev-bar jev-bar-' + k;
+    bar.style.setProperty('--v', Math.round((answers[k] ?? 0) * 100) + '%');
+    bars.appendChild(bar);
+  }
+  avatar.insertAdjacentElement('afterend', bars);
+  col.classList.add('jev-col', 'jev-r-' + rarity);
+  col.title = JEV_I18N.t('rarity', lang, { r: JEV_I18N.ui.rarityName[lang]?.[rarity] || rarity, b: pct(answers.buzz), e: pct(answers.engage) });
+  wireTriple(article, col);
+}
+
+const HOLD_MS = 600;
+function wireTriple(article, col) {
+  let timer = null, fired = false;
+  const cancel = () => { clearTimeout(timer); timer = null; col.classList.remove('jev-hold'); };
+  col.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    fired = false;
+    col.classList.add('jev-hold');
+    timer = setTimeout(() => { timer = null; fired = true; col.classList.remove('jev-hold'); triple(article, col); }, HOLD_MS);
+  });
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) col.addEventListener(ev, cancel);
+  // A completed long press must not also open the author's profile.
+  col.addEventListener('click', e => { if (fired) { e.preventDefault(); e.stopPropagation(); fired = false; } }, true);
+  col.addEventListener('contextmenu', e => { if (timer || fired) e.preventDefault(); });
+  col.addEventListener('dragstart', e => { if (timer) e.preventDefault(); });
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function waitFor(sel, ms = 1500) {
+  for (let t = 0; t < ms; t += 50) { const el = document.querySelector(sel); if (el) return el; await sleep(50); }
+  return null;
+}
+
+// Only turns things on: an already-liked / reposted / bookmarked post is left as is.
+async function triple(article, col) {
+  col.classList.remove('jev-boom'); void col.offsetWidth; col.classList.add('jev-boom');
+  const q = sel => article.querySelector(sel);
+  q('[data-testid="bookmark"]')?.click();
+  await sleep(150);
+  q('[data-testid="like"]')?.click();
+  await sleep(150);
+  const rt = q('[data-testid="retweet"]');
+  if (rt) { rt.click(); (await waitFor('[data-testid="retweetConfirm"]'))?.click(); }
 }
 
 // ---- Timeline filter: a matched post is faded to 50% and comes back on hover. ----
