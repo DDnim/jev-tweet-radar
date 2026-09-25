@@ -280,6 +280,9 @@ function renderNote(article, text) {
   textEl.insertAdjacentElement('afterend', row);
 }
 
+// Preload: judge posts once they are within this distance below/above the viewport, so the result is there
+// by the time you scroll to them. X keeps only a few screens of posts in the DOM, so this stays cheap.
+const PRELOAD_PX = 2000;
 const io = new IntersectionObserver(entries => {
   for (const en of entries) {
     if (!en.isIntersecting) continue;
@@ -295,7 +298,7 @@ const io = new IntersectionObserver(entries => {
       else if (res.skipped === 'rate') { seen.delete?.(article); setTimeout(() => io.observe(article), 15000); }
     });
   }
-}, { threshold: 0.4 });
+}, { rootMargin: `${PRELOAD_PX}px 0px`, threshold: 0 });
 
 function scan() {
   for (const a of document.querySelectorAll('article[data-testid="tweet"]')) {
