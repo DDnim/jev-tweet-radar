@@ -32,15 +32,30 @@
 
 /* avatar column: rarity background, buzz/engage bars, long-press triple */
 .jev-col{position:relative;isolation:isolate;border-radius:12px;transition:background .2s}
-.jev-col::before{content:"";position:absolute;inset:-4px -4px 0;border-radius:12px;pointer-events:none;z-index:-1;background:linear-gradient(180deg,var(--jev-c) 0%,transparent 85%);opacity:.35}
-.jev-r-gold{--jev-c:#f5b400}
-.jev-r-gold::before{opacity:.55;box-shadow:0 0 10px rgba(245,180,0,.45)}
-.jev-r-purple{--jev-c:#a35cff}
-.jev-r-green{--jev-c:#2ecc71}
-.jev-r-white{--jev-c:#c8ccd0}
-.jev-r-white::before{opacity:.18}
+/* Mixed with transparency instead of `opacity`, so the edge and glow stay strong on X's dark (Dim / Lights out) themes. */
+.jev-col::before{content:"";position:absolute;inset:-4px -4px 0;border-radius:12px;pointer-events:none;z-index:-1;
+ background:linear-gradient(180deg,color-mix(in srgb,var(--jev-c) var(--jev-top,55%),transparent) 0%,color-mix(in srgb,var(--jev-c) var(--jev-bot,15%),transparent) 100%);
+ box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--jev-c) 85%,transparent)}
+.jev-r-gold{--jev-c:#ffc21a;--jev-top:70%;--jev-bot:22%}
+.jev-r-purple{--jev-c:#b57bff}
+.jev-r-green{--jev-c:#3ddc84}
+.jev-r-white{--jev-c:#e7e9ea;--jev-top:28%;--jev-bot:6%}
+/* Legendary: outer glow, a light sweep, and twinkling sparkles. */
+.jev-r-gold::before{box-shadow:inset 0 0 0 1.5px #ffd75e,0 0 12px 1px rgba(255,194,26,.6);
+ background-image:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%),linear-gradient(180deg,color-mix(in srgb,#ffc21a 70%,transparent),color-mix(in srgb,#ffc21a 22%,transparent));
+ background-size:100% 300%,100% 100%;background-repeat:no-repeat;animation:jev-sweep 2.8s ease-in-out infinite}
+.jev-r-gold::after{content:"";position:absolute;inset:-4px -4px 0;pointer-events:none;z-index:-1;
+ background:
+  radial-gradient(circle at 12% 62%,#fff 0 2px,transparent 3px),
+  radial-gradient(circle at 86% 48%,#fff6c8 0 2.5px,transparent 3.5px),
+  radial-gradient(circle at 30% 82%,#ffe27a 0 2px,transparent 3px),
+  radial-gradient(circle at 74% 72%,#fff 0 1.5px,transparent 2.5px),
+  radial-gradient(circle at 50% 94%,#fff6c8 0 2.5px,transparent 3.5px);
+ animation:jev-twinkle 1.6s ease-in-out infinite alternate}
+@keyframes jev-sweep{0%{background-position:0 100%,0 0}60%,100%{background-position:0 -100%,0 0}}
+@keyframes jev-twinkle{from{opacity:.35}to{opacity:1}}
 .jev-bars{display:flex;justify-content:center;gap:4px;height:28px;margin:4px auto 0}
-.jev-bar{width:4px;border-radius:2px;background:rgba(139,152,165,.25);overflow:hidden;position:relative}
+.jev-bar{width:4px;border-radius:2px;background:rgba(15,20,25,.55);box-shadow:0 0 0 .5px rgba(255,255,255,.18);overflow:hidden;position:relative}
 .jev-bar::after{content:"";position:absolute;inset:auto 0 0 0;height:var(--v);border-radius:2px}
 .jev-bars-flat{flex-direction:column;gap:2px;width:32px;height:auto}
 .jev-bars-flat .jev-bar{width:auto;height:3px}
