@@ -13,7 +13,7 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 3. x.com を開く。スクロールで表示されたポストから順に判定される（同じポストは `chrome.storage.local` にキャッシュ、再問い合わせなし）。
 
 ## 仕組み
-- `content.js`：`article[data-testid="tweet"]` を IntersectionObserver で監視、表示 40% 以上で本文・著者・時刻・メディア有無を抽出して background へ。
+- `content.js`：`article[data-testid="tweet"]` を IntersectionObserver で監視、画面の上下 2000px 以内に入った時点で（先読み）本文・著者・時刻・メディア有無を抽出して background へ。
 - `background.js`：`POST https://api.typesafe.ai/v1/systemone` に `state`（投稿）と選択中の Noul 質問（`questions.js`、オプションで選択）を 1 リクエストで送信。429/529 は指数バックオフ。1 分あたりの上限はオプションで設定。
 - 費用：1 判定 ≈ 300 input token ≈ $0.00001（出力は無料）。ポップアップに今日の件数と概算を表示。
 
