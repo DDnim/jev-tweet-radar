@@ -1,4 +1,4 @@
-import { QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor, DEFAULT_FILTER, filterReasons } from './questions.js';
+importScripts('questions.js'); // QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor, DEFAULT_FILTER, filterReasons
 
 const API = 'https://api.typesafe.ai/v1/systemone';
 const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER };

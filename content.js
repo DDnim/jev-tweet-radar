@@ -125,15 +125,17 @@ async function block(article) {
 
 const HOLD_MS = 600;
 function wireLongPress(article, col, action) {
-  let timer = null, fired = false;
+  let timer = null, fired = false, x0 = 0, y0 = 0;
   const cancel = () => { clearTimeout(timer); timer = null; col.classList.remove('jev-hold'); };
   col.addEventListener('pointerdown', e => {
     if (e.button !== 0) return;
-    fired = false;
+    fired = false; x0 = e.clientX; y0 = e.clientY;
     col.classList.add('jev-hold');
     timer = setTimeout(() => { timer = null; fired = true; col.classList.remove('jev-hold'); col.classList.remove('jev-boom'); void col.offsetWidth; col.classList.add('jev-boom'); action(); }, HOLD_MS);
   });
   for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) col.addEventListener(ev, cancel);
+  // On a touch screen a finger that starts to scroll is not a long press.
+  col.addEventListener('pointermove', e => { if (timer && Math.hypot(e.clientX - x0, e.clientY - y0) > 10) cancel(); });
   // A completed long press must not also open the author's profile.
   col.addEventListener('click', e => { if (fired) { e.preventDefault(); e.stopPropagation(); fired = false; } }, true);
   col.addEventListener('contextmenu', e => { if (timer || fired) e.preventDefault(); });

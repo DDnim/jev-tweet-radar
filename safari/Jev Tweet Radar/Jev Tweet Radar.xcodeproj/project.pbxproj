@@ -1,0 +1,620 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3102F2553067575E000B6FEC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3102F2543067575E000B6FEC /* AppDelegate.swift */; };
+		3102F2593067575E000B6FEC /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2573067575E000B6FEC /* Main.html */; };
+		3102F25B3067575E000B6FEC /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3102F25A3067575E000B6FEC /* Icon.png */; };
+		3102F25D3067575E000B6FEC /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 3102F25C3067575E000B6FEC /* Style.css */; };
+		3102F25F3067575E000B6FEC /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3102F25E3067575E000B6FEC /* SceneDelegate.swift */; };
+		3102F2613067575E000B6FEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3102F2603067575E000B6FEC /* ViewController.swift */; };
+		3102F2643067575E000B6FEC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2623067575E000B6FEC /* LaunchScreen.storyboard */; };
+		3102F2673067575E000B6FEC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2653067575E000B6FEC /* Main.storyboard */; };
+		3102F26F3067575E000B6FEC /* Jev Tweet Radar Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 3102F26E3067575E000B6FEC /* Jev Tweet Radar Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3102F2743067575E000B6FEC /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3102F2733067575E000B6FEC /* SafariWebExtensionHandler.swift */; };
+		3102F2763067575E000B6FEC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2683067575E000B6FEC /* Assets.xcassets */; };
+		3102F28F3067575E000B6FEC /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2813067575E000B6FEC /* popup.js */; };
+		3102F2903067575E000B6FEC /* content.css in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2823067575E000B6FEC /* content.css */; };
+		3102F2923067575E000B6FEC /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2843067575E000B6FEC /* background.js */; };
+		3102F2933067575E000B6FEC /* questions.js in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2853067575E000B6FEC /* questions.js */; };
+		3102F2943067575E000B6FEC /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2863067575E000B6FEC /* popup.html */; };
+		3102F2953067575E000B6FEC /* options.js in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2873067575E000B6FEC /* options.js */; };
+		3102F2963067575E000B6FEC /* icon128.png in Resources */ = {isa = PBXBuildFile; fileRef = 3102F2883067575E000B6FEC /* icon128.png */; };
+		3102F2993067575E000B6FEC /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 3102F28B3067575E000B6FEC /* manifest.json */; };
+		3102F29A3067575E000B6FEC /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = 3102F28C3067575E000B6FEC /* options.html */; };
+		3102F29B3067575E000B6FEC /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 3102F28D3067575E000B6FEC /* content.js */; };
+		3102F29C3067575E000B6FEC /* i18n.js in Resources */ = {isa = PBXBuildFile; fileRef = 3102F28E3067575E000B6FEC /* i18n.js */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3102F2703067575E000B6FEC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3102F2493067575E000B6FEC /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3102F26D3067575E000B6FEC;
+			remoteInfo = "Jev Tweet Radar Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3102F27C3067575E000B6FEC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				3102F26F3067575E000B6FEC /* Jev Tweet Radar Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3102F2513067575E000B6FEC /* Jev Tweet Radar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Jev Tweet Radar.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3102F2543067575E000B6FEC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3102F2583067575E000B6FEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		3102F25A3067575E000B6FEC /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		3102F25C3067575E000B6FEC /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		3102F25E3067575E000B6FEC /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		3102F2603067575E000B6FEC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		3102F2633067575E000B6FEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3102F2663067575E000B6FEC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3102F2683067575E000B6FEC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3102F2693067575E000B6FEC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3102F26E3067575E000B6FEC /* Jev Tweet Radar Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Jev Tweet Radar Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3102F2733067575E000B6FEC /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		3102F2753067575E000B6FEC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3102F2813067575E000B6FEC /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../popup.js; sourceTree = "<group>"; };
+		3102F2823067575E000B6FEC /* content.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = content.css; path = ../../../content.css; sourceTree = "<group>"; };
+		3102F2843067575E000B6FEC /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../background.js; sourceTree = "<group>"; };
+		3102F2853067575E000B6FEC /* questions.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = questions.js; path = ../../../questions.js; sourceTree = "<group>"; };
+		3102F2863067575E000B6FEC /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../popup.html; sourceTree = "<group>"; };
+		3102F2873067575E000B6FEC /* options.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = options.js; path = ../../../options.js; sourceTree = "<group>"; };
+		3102F2883067575E000B6FEC /* icon128.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon128.png; path = ../../../icon128.png; sourceTree = "<group>"; };
+		3102F28B3067575E000B6FEC /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../manifest.json; sourceTree = "<group>"; };
+		3102F28C3067575E000B6FEC /* options.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = options.html; path = ../../../options.html; sourceTree = "<group>"; };
+		3102F28D3067575E000B6FEC /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../content.js; sourceTree = "<group>"; };
+		3102F28E3067575E000B6FEC /* i18n.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = i18n.js; path = ../../../i18n.js; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3102F24E3067575E000B6FEC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		3102F26B3067575E000B6FEC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3102F2483067575E000B6FEC = {
+			isa = PBXGroup;
+			children = (
+				3102F2533067575E000B6FEC /* Jev Tweet Radar */,
+				3102F2723067575E000B6FEC /* Jev Tweet Radar Extension */,
+				3102F2523067575E000B6FEC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3102F2523067575E000B6FEC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3102F2513067575E000B6FEC /* Jev Tweet Radar.app */,
+				3102F26E3067575E000B6FEC /* Jev Tweet Radar Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3102F2533067575E000B6FEC /* Jev Tweet Radar */ = {
+			isa = PBXGroup;
+			children = (
+				3102F2543067575E000B6FEC /* AppDelegate.swift */,
+				3102F25E3067575E000B6FEC /* SceneDelegate.swift */,
+				3102F2603067575E000B6FEC /* ViewController.swift */,
+				3102F2623067575E000B6FEC /* LaunchScreen.storyboard */,
+				3102F2653067575E000B6FEC /* Main.storyboard */,
+				3102F2683067575E000B6FEC /* Assets.xcassets */,
+				3102F2693067575E000B6FEC /* Info.plist */,
+				3102F2563067575E000B6FEC /* Resources */,
+			);
+			path = "Jev Tweet Radar";
+			sourceTree = "<group>";
+		};
+		3102F2563067575E000B6FEC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3102F2573067575E000B6FEC /* Main.html */,
+				3102F25A3067575E000B6FEC /* Icon.png */,
+				3102F25C3067575E000B6FEC /* Style.css */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		3102F2723067575E000B6FEC /* Jev Tweet Radar Extension */ = {
+			isa = PBXGroup;
+			children = (
+				3102F2803067575E000B6FEC /* Resources */,
+				3102F2733067575E000B6FEC /* SafariWebExtensionHandler.swift */,
+				3102F2753067575E000B6FEC /* Info.plist */,
+			);
+			path = "Jev Tweet Radar Extension";
+			sourceTree = "<group>";
+		};
+		3102F2803067575E000B6FEC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3102F2813067575E000B6FEC /* popup.js */,
+				3102F2823067575E000B6FEC /* content.css */,
+				3102F2843067575E000B6FEC /* background.js */,
+				3102F2853067575E000B6FEC /* questions.js */,
+				3102F2863067575E000B6FEC /* popup.html */,
+				3102F2873067575E000B6FEC /* options.js */,
+				3102F2883067575E000B6FEC /* icon128.png */,
+				3102F28B3067575E000B6FEC /* manifest.json */,
+				3102F28C3067575E000B6FEC /* options.html */,
+				3102F28D3067575E000B6FEC /* content.js */,
+				3102F28E3067575E000B6FEC /* i18n.js */,
+			);
+			name = Resources;
+			path = "Jev Tweet Radar Extension";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3102F2503067575E000B6FEC /* Jev Tweet Radar */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3102F27D3067575E000B6FEC /* Build configuration list for PBXNativeTarget "Jev Tweet Radar" */;
+			buildPhases = (
+				3102F24D3067575E000B6FEC /* Sources */,
+				3102F24E3067575E000B6FEC /* Frameworks */,
+				3102F24F3067575E000B6FEC /* Resources */,
+				3102F27C3067575E000B6FEC /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3102F2713067575E000B6FEC /* PBXTargetDependency */,
+			);
+			name = "Jev Tweet Radar";
+			productName = "Jev Tweet Radar";
+			productReference = 3102F2513067575E000B6FEC /* Jev Tweet Radar.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3102F26D3067575E000B6FEC /* Jev Tweet Radar Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3102F2793067575E000B6FEC /* Build configuration list for PBXNativeTarget "Jev Tweet Radar Extension" */;
+			buildPhases = (
+				3102F26A3067575E000B6FEC /* Sources */,
+				3102F26B3067575E000B6FEC /* Frameworks */,
+				3102F26C3067575E000B6FEC /* Resources */,
+			);
+			buildRules = (
+			);
+			name = "Jev Tweet Radar Extension";
+			productName = "Jev Tweet Radar Extension";
+			productReference = 3102F26E3067575E000B6FEC /* Jev Tweet Radar Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3102F2493067575E000B6FEC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					3102F2503067575E000B6FEC = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					3102F26D3067575E000B6FEC = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = 3102F24C3067575E000B6FEC /* Build configuration list for PBXProject "Jev Tweet Radar" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3102F2483067575E000B6FEC;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 3102F2523067575E000B6FEC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3102F2503067575E000B6FEC /* Jev Tweet Radar */,
+				3102F26D3067575E000B6FEC /* Jev Tweet Radar Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3102F24F3067575E000B6FEC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				3102F25B3067575E000B6FEC /* Icon.png in Resources */,
+				3102F2673067575E000B6FEC /* Main.storyboard in Resources */,
+				3102F2643067575E000B6FEC /* LaunchScreen.storyboard in Resources */,
+				3102F2593067575E000B6FEC /* Main.html in Resources */,
+				3102F2763067575E000B6FEC /* Assets.xcassets in Resources */,
+				3102F25D3067575E000B6FEC /* Style.css in Resources */,
+			);
+		};
+		3102F26C3067575E000B6FEC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+				3102F2923067575E000B6FEC /* background.js in Resources */,
+				3102F2943067575E000B6FEC /* popup.html in Resources */,
+				3102F2963067575E000B6FEC /* icon128.png in Resources */,
+				3102F29B3067575E000B6FEC /* content.js in Resources */,
+				3102F2993067575E000B6FEC /* manifest.json in Resources */,
+				3102F2953067575E000B6FEC /* options.js in Resources */,
+				3102F29C3067575E000B6FEC /* i18n.js in Resources */,
+				3102F28F3067575E000B6FEC /* popup.js in Resources */,
+				3102F2903067575E000B6FEC /* content.css in Resources */,
+				3102F2933067575E000B6FEC /* questions.js in Resources */,
+				3102F29A3067575E000B6FEC /* options.html in Resources */,
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3102F24D3067575E000B6FEC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				3102F2613067575E000B6FEC /* ViewController.swift in Sources */,
+				3102F2553067575E000B6FEC /* AppDelegate.swift in Sources */,
+				3102F25F3067575E000B6FEC /* SceneDelegate.swift in Sources */,
+			);
+		};
+		3102F26A3067575E000B6FEC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				3102F2743067575E000B6FEC /* SafariWebExtensionHandler.swift in Sources */,
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3102F2713067575E000B6FEC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3102F26D3067575E000B6FEC /* Jev Tweet Radar Extension */;
+			targetProxy = 3102F2703067575E000B6FEC /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3102F2573067575E000B6FEC /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3102F2583067575E000B6FEC /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		3102F2623067575E000B6FEC /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3102F2633067575E000B6FEC /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		3102F2653067575E000B6FEC /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3102F2663067575E000B6FEC /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3102F2773067575E000B6FEC /* Debug configuration for PBXProject "Jev Tweet Radar" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		3102F2783067575E000B6FEC /* Release configuration for PBXProject "Jev Tweet Radar" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3102F27A3067575E000B6FEC /* Debug configuration for PBXNativeTarget "Jev Tweet Radar Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Jev Tweet Radar Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Jev Tweet Radar Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ddnim.JevTweetRadar.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3102F27B3067575E000B6FEC /* Release configuration for PBXNativeTarget "Jev Tweet Radar Extension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Jev Tweet Radar Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Jev Tweet Radar Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ddnim.JevTweetRadar.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		3102F27E3067575E000B6FEC /* Debug configuration for PBXNativeTarget "Jev Tweet Radar" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Jev Tweet Radar/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Jev Tweet Radar";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ddnim.JevTweetRadar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3102F27F3067575E000B6FEC /* Release configuration for PBXNativeTarget "Jev Tweet Radar" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Jev Tweet Radar/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Jev Tweet Radar";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.ddnim.JevTweetRadar;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3102F24C3067575E000B6FEC /* Build configuration list for PBXProject "Jev Tweet Radar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3102F2773067575E000B6FEC /* Debug configuration for PBXProject "Jev Tweet Radar" */,
+				3102F2783067575E000B6FEC /* Release configuration for PBXProject "Jev Tweet Radar" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		3102F2793067575E000B6FEC /* Build configuration list for PBXNativeTarget "Jev Tweet Radar Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3102F27A3067575E000B6FEC /* Debug configuration for PBXNativeTarget "Jev Tweet Radar Extension" */,
+				3102F27B3067575E000B6FEC /* Release configuration for PBXNativeTarget "Jev Tweet Radar Extension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		3102F27D3067575E000B6FEC /* Build configuration list for PBXNativeTarget "Jev Tweet Radar" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3102F27E3067575E000B6FEC /* Debug configuration for PBXNativeTarget "Jev Tweet Radar" */,
+				3102F27F3067575E000B6FEC /* Release configuration for PBXNativeTarget "Jev Tweet Radar" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 3102F2493067575E000B6FEC /* Project object */;
+	validationLevel = 1;
+}
