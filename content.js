@@ -29,7 +29,7 @@ function send(msg, cb) {
   try {
     chrome.runtime.sendMessage(msg, res => {
       const err = chrome.runtime.lastError;
-      if (err) { console.error('[JevRadar] background error:', err.message); return cb(undefined); }
+      if (err) { console.error('[JevRadar] background error:', err.message); return cb({ error: 'background: ' + err.message }); }
       if (res?.error) console.warn('[JevRadar]', res.error);
       cb(res);
     });
@@ -302,7 +302,16 @@ const io = new IntersectionObserver(entries => {
   }
 }, { rootMargin: `${PRELOAD_PX}px 0px`, threshold: 0 });
 
+// Heartbeat for the popup: the page script is running here and sees this many posts.
+let beatAt = 0;
+function heartbeat(n) {
+  if (Date.now() - beatAt < 5000) return;
+  beatAt = Date.now();
+  try { chrome.storage.local.set({ pageSeen: { at: beatAt, host: location.host, posts: n } }); } catch (_) {}
+}
+
 function scan() {
+  heartbeat(document.querySelectorAll('article[data-testid="tweet"]').length);
   for (const a of document.querySelectorAll('article[data-testid="tweet"]')) {
     if (seen.has(a)) continue;
     seen.add(a);

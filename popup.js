@@ -13,5 +13,18 @@ chrome.storage.sync.get({ enabled: true, lang: '' }, s => {
     document.getElementById('total').textContent = JEV_I18N.t('total', lang, { n: all });
   });
 });
+// Status for debugging on a phone: background reachable? key set? does the x.com page script run? last error.
+function ago(t) { return t ? Math.round((Date.now() - t) / 1000) + 's' : '–'; }
+chrome.runtime.sendMessage({ type: 'ping' }, res => {
+  const bg = chrome.runtime.lastError ? 'NG (' + chrome.runtime.lastError.message + ')' : res?.ok ? 'OK' : 'NG (' + (res?.error || 'no reply') + ')';
+  chrome.storage.local.get(['pageSeen', 'lastError'], ({ pageSeen, lastError }) => {
+    document.getElementById('diag').textContent = [
+      'background: ' + bg,
+      'API key: ' + (res?.hasKey ? 'OK' : 'none'),
+      'x.com script: ' + (pageSeen ? `${pageSeen.host} · ${pageSeen.posts} posts · ${ago(pageSeen.at)} ago` : 'never ran'),
+      lastError ? `last error (${ago(lastError.at)} ago): ${lastError.msg}` : ''
+    ].filter(Boolean).join('\n');
+  });
+});
 document.getElementById('enabled').onchange = e => chrome.storage.sync.set({ enabled: e.target.checked });
 document.getElementById('opt').onclick = e => { e.preventDefault(); chrome.runtime.openOptionsPage(); };
