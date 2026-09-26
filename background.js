@@ -1,4 +1,6 @@
-importScripts('questions.js'); // QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor, DEFAULT_FILTER, filterReasons
+// QUESTIONS, TAG_ORDER, DEFAULT_TAGS, GOALS, engageFor, DEFAULT_FILTER, filterReasons. Chrome runs this as a service worker
+// and imports them; Safari (iOS) runs `background.scripts`, where questions.js is already loaded before this file.
+if (typeof QUESTIONS === 'undefined') importScripts('questions.js');
 
 const API = 'https://api.typesafe.ai/v1/systemone';
 const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, model: 'jev-latest', tags: DEFAULT_TAGS, goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER };
@@ -86,7 +88,11 @@ async function judge(post, settings) {
   throw new Error('rate limited');
 }
 
+// Last failure, shown in the popup so a phone (no console) can tell why nothing appears.
+function noteError(e) { chrome.storage.local.set({ lastError: { at: Date.now(), msg: String(e?.message || e).slice(0, 200) } }); }
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.type === 'ping') { getSettings().then(s => sendResponse({ ok: true, hasKey: !!s.apiKey, enabled: s.enabled }), e => sendResponse({ ok: false, error: String(e.message || e) })); return true; }
   if (msg.type !== 'judge') return;
   (async () => {
    try {
@@ -101,8 +107,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!rateOk(settings.maxPerMinute)) return { skipped: 'rate' };
     const p = judge(msg.post, settings).then(async a => { await remember(k, a); return a; }).finally(() => inflight.delete(k));
     inflight.set(k, p);
-    try { return reply(await p); } catch (e) { return { error: String(e.message || e) }; }
-   } catch (e) { console.error('[JevRadar]', e); return { error: String(e.message || e) }; }
+    try { return reply(await p); } catch (e) { noteError(e); return { error: String(e.message || e) }; }
+   } catch (e) { console.error('[JevRadar]', e); noteError(e); return { error: String(e.message || e) }; }
   })().then(sendResponse);
   return true;
 });
