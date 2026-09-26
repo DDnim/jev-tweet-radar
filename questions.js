@@ -1,5 +1,5 @@
-// Shared question set. Each is a Noul (yes/no → probability). One API call per post returns all six.
-export const QUESTIONS = {
+// Shared question set (classic script, loaded with importScripts: Safari has no module service workers). Each is a Noul (yes/no → probability). One API call per post returns all six.
+const QUESTIONS = {
   engage: {
     type: 'noul',
     instructions: 'この投稿は、AI・データ・ソフトウェア開発に関心がある読者にとって、返信や引用で絡む価値があるか？ 具体的な主張や情報があり、議論の余地があり、スパム・宣伝・bot・内容のない反応ではない。',
@@ -46,7 +46,7 @@ export const QUESTIONS = {
     criteria: { true: 'AIが書いたように見える', false: '人が書いたように見える' }
   }
 };
-export const LABELS = {
+const LABELS = {
   engage: { ja: '絡む価値', zh: '值得互动', en: 'Engage' },
   buzz: { ja: 'バズる', zh: '会火', en: 'Buzz' },
   flame: { ja: '炎上', zh: '炎上', en: 'Flame' },
@@ -58,12 +58,12 @@ export const LABELS = {
   ai_smell: { ja: 'AI臭', zh: 'AI 味', en: 'AI-ish' }
 };
 // Selectable tags in display order; `engage` is always asked and shown as the main badge.
-export const TAG_ORDER = ['spam', 'buzz', 'flame', 'ignored', 'misread', 'repost', 'bookmark', 'ai_smell'];
-export const DEFAULT_TAGS = ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'];
+const TAG_ORDER = ['spam', 'buzz', 'flame', 'ignored', 'misread', 'repost', 'bookmark', 'ai_smell'];
+const DEFAULT_TAGS = ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'];
 
 // Timeline filter: a matched post is shown at 50% opacity and restored on hover. `rules` is keyed by tag:
 // { on, op: 'ge'|'lt', v }. A rule's tag is asked even when it is not a displayed tag, so a filter can run silently.
-export const DEFAULT_FILTER = {
+const DEFAULT_FILTER = {
   on: true,
   rules: {
     spam: { on: true, op: 'ge', v: 0.7 },
@@ -73,7 +73,7 @@ export const DEFAULT_FILTER = {
     engage: { on: false, op: 'lt', v: 0.3 }
   }
 };
-export function filterReasons(answers, filter) {
+function filterReasons(answers, filter) {
   if (!filter?.on) return [];
   const out = [];
   for (const [tag, r] of Object.entries(filter.rules || {})) {
@@ -87,7 +87,7 @@ export function filterReasons(answers, filter) {
 
 // Viewer goal presets. The goal is placed in `state.viewer_goal` and rewrites the `engage` question so
 // "worth engaging" is judged relative to what the viewer wants; other tags stay objective.
-export const GOALS = {
+const GOALS = {
   grow: {
     label: { ja: 'フォロワーを増やしたい', zh: '我主要想涨粉', en: 'Grow followers' },
     text: 'フォロワーを増やしたい。影響力のある人や伸びている話題に、自分が価値を足せる返信・引用で絡み、露出とフォローにつなげたい。'
@@ -102,7 +102,7 @@ export const GOALS = {
   },
   custom: { label: { ja: '自分で書く', zh: '自定义', en: 'Custom' }, text: '' }
 };
-export function engageFor(goalText) {
+function engageFor(goalText) {
   if (!goalText) return QUESTIONS.engage;
   return {
     type: 'noul',

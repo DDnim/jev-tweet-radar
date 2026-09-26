@@ -34,6 +34,20 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 ## 投稿前判定
 発言欄（返信欄も）に 8 文字以上入力して 1.2 秒止まると、同じ軸で下書きを採点してツールバーの上に表示する。返信は返信先の投稿を `state.replying_to` として一緒に送り、組み合わせで判定する。
 
+## iOS Safari
+`safari/Jev Tweet Radar/` は `xcrun safari-web-extension-converter --ios-only` で作った Xcode プロジェクト。拡張のファイルはコピーせずルートのものを参照するので、Chrome 版と同じソースで動く。
+ファイルを足したら converter を `--rebuild-project` で掛け直す（`safari/`・README・LICENSE がリソースに入ったら pbxproj から外す）。
+
+iPhone に入れる手順:
+1. iPhone を USB で Mac に接続し「このコンピュータを信頼」。設定 → プライバシーとセキュリティ → デベロッパモードを ON（再起動）。
+2. Xcode → Settings → Accounts で Apple ID にサインイン。
+3. `Jev Tweet Radar.xcodeproj` を開き、2 つの target（App と Extension）の Signing & Capabilities で Team を自分の Personal Team に。
+4. 実行先に iPhone を選び ⌘R。iPhone の 設定 → 一般 → VPN とデバイス管理 で開発元を信頼。
+5. 設定 → アプリ → Safari → 機能拡張 → Jev Tweet Radar を ON、x.com を「許可」。
+6. Safari で x.com を開き、アドレスバーの拡張メニュー → Jev Tweet Radar → 設定で API キーを保存。
+
+無料の Apple ID だと 7 日で起動できなくなるので、そのたびに ⌘R で入れ直す。X アプリの中では動かない（Safari で x.com を開いたときだけ）。
+
 ## English
 
 Chrome extension (MV3) that scores every post on your X timeline with **one** call to [Jev](https://typesafe.ai) (TypeSafe's System One Model): *worth engaging*, plus selectable tags — *spam / buzz / flame / ignored / misread / repost-worthy / bookmark-worthy / AI-ish* — as calibrated probabilities, shown in the avatar column (vertical bars + rarity tint); no badge row under the post text (drafts still get one). Pick a goal (grow followers / learn / excitement / custom text) and *worth engaging* is judged against it. Also scores your own draft (and replies, together with the parent post) before you hit Post.
