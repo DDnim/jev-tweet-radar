@@ -41,7 +41,7 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 iPhone に入れる手順:
 1. iPhone を USB で Mac に接続し「このコンピュータを信頼」。設定 → プライバシーとセキュリティ → デベロッパモードを ON（再起動）。
 2. Xcode → Settings → Accounts で Apple ID にサインイン。
-3. `Jev Tweet Radar.xcodeproj` を開き、2 つの target（App と Extension）の Signing & Capabilities で Team を自分の Personal Team に。
+3. `Jev Tweet Radar.xcodeproj` を開き、Team は `462D5897WD`（inkfall と同じ）を設定済み。別の Apple ID で入れるときだけ 2 つの target の Signing & Capabilities で変える。
 4. 実行先に iPhone を選び ⌘R。iPhone の 設定 → 一般 → VPN とデバイス管理 で開発元を信頼。
 5. 設定 → アプリ → Safari → 機能拡張 → Jev Tweet Radar を ON、x.com を「許可」。
 6. Safari で x.com を開き、アドレスバーの拡張メニュー → Jev Tweet Radar → 設定で API キーを保存。
