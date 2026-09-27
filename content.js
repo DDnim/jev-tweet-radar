@@ -86,6 +86,7 @@ function decorateAvatar(article, answers, settings) {
   const tip = JEV_I18N.t('rarity', lang, { r: JEV_I18N.ui.rarityName[lang]?.[rarity] || rarity, b: pct(answers.buzz), e: pct(answers.engage) });
   col.title = junk.length ? JEV_I18N.t('rarityBlock', lang, { r: tip.split('\n')[0], u: author }) : tip;
   if (junk.length) fold(article, col, junk.map(k => `${LABELS[k][lang]} ${pct(answers[k])}`).join(' · '), lang, author);
+  if (!junk.length) markTargets(article, answers);
   wireLongPress(article, col, junk.length ? () => block(article) : () => triple(article, answers));
 }
 
@@ -162,6 +163,15 @@ function triplePlan(answers, reposted) {
   return { repost, open };
 }
 
+// Marks on the action bar what a long press will do: ✎ on the button whose window opens, a dot on repost when it reposts directly.
+function markTargets(article, answers) {
+  for (const b of article.querySelectorAll('[data-jev-will]')) b.removeAttribute('data-jev-will');
+  const rt = article.querySelector('[data-testid="retweet"]');
+  const { repost, open } = triplePlan(answers, !rt);
+  if (open === 'reply') article.querySelector('[data-testid="reply"]')?.setAttribute('data-jev-will', 'window');
+  if (rt && (open === 'quote' || repost)) rt.setAttribute('data-jev-will', open === 'quote' ? 'window' : 'repost');
+}
+
 // Only turns things on: an already-liked / reposted / bookmarked post is left as is. Windows open last and are never submitted.
 const busy = new WeakSet();
 async function triple(article, answers) {
@@ -184,7 +194,7 @@ async function triple(article, answers) {
     const quote = [...document.querySelectorAll('[role="menuitem"]')].find(m => /\/compose\/(post|tweet)/.test(m.getAttribute('href') || '') || /Quote|引用/.test(m.textContent));
     if (quote) quote.click();
     else if (menu) menu.click(); // no Quote item found: fall back to the plain repost the score already earned
-  } finally { busy.delete(article); }
+  } finally { busy.delete(article); setTimeout(() => markTargets(article, answers), 1000); }
 }
 
 // ---- Timeline filter: a matched post is faded to 50% and comes back on hover. ----

@@ -67,6 +67,12 @@
 @keyframes jev-shake{0%,100%{transform:translate(0,0) rotate(0)}25%{transform:translate(-1px,1px) rotate(-2deg)}50%{transform:translate(1px,-1px) rotate(2deg)}75%{transform:translate(-1px,0) rotate(-1deg)}}
 @keyframes jev-boom{0%{transform:scale(1)}20%{transform:scale(1.15) rotate(-6deg)}40%{transform:scale(1.1) rotate(6deg)}60%{transform:scale(1.05) rotate(-3deg)}100%{transform:scale(1) rotate(0)}}
 
+/* what a long press will do: ✎ = opens that window, dot = reposts directly */
+[data-jev-will]{position:relative}
+[data-jev-will]::after{position:absolute;top:2px;left:26px;pointer-events:none;border-radius:50%;background:#1d9bf0;color:#fff;box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
+[data-jev-will="window"]::after{content:"✎";width:13px;height:13px;font:9px/13px -apple-system,sans-serif;text-align:center}
+[data-jev-will="repost"]::after{content:"";width:7px;height:7px;background:#00ba7c;top:5px}
+
 /* junk fold (spam / AI-ish > 85%) */
 .jev-fold-hide{display:none!important}
 .jev-folded .jev-bars{display:none}
