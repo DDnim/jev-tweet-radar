@@ -48,7 +48,7 @@ function render(article, answers, settings, filtered) {
   if (filtered?.length) applyFilter(article, answers, settings, filtered);
 }
 
-// ---- Avatar column: two tiny bars (buzz / engage), a rarity background, and a long press ("triple" = bookmark + repost + like, or block on junk). ----
+// ---- Avatar column: two tiny bars (buzz / engage), a rarity background, and a long press ("triple" = bookmark + like + repost / reply or quote window by score, or block on junk). ----
 function rarityOf(answers) {
   const v = Math.max(answers.buzz ?? 0, answers.engage ?? 0);
   return v > 0.75 ? 'gold' : v > 0.6 ? 'purple' : v > 0.45 ? 'green' : 'white';
@@ -86,7 +86,7 @@ function decorateAvatar(article, answers, settings) {
   const tip = JEV_I18N.t('rarity', lang, { r: JEV_I18N.ui.rarityName[lang]?.[rarity] || rarity, b: pct(answers.buzz), e: pct(answers.engage) });
   col.title = junk.length ? JEV_I18N.t('rarityBlock', lang, { r: tip.split('\n')[0], u: author }) : tip;
   if (junk.length) fold(article, col, junk.map(k => `${LABELS[k][lang]} ${pct(answers[k])}`).join(' · '), lang, author);
-  wireLongPress(article, col, junk.length ? () => block(article) : () => triple(article, col));
+  wireLongPress(article, col, junk.length ? () => block(article) : () => triple(article, answers));
 }
 
 // ---- Junk (spam / AI-ish over 85%): fold the post down to its header line; long-press on the avatar blocks the author. ----
@@ -148,15 +148,43 @@ async function waitFor(sel, ms = 1500) {
   return null;
 }
 
-// Only turns things on: an already-liked / reposted / bookmarked post is left as is.
-async function triple(article, col) {
-  const q = sel => article.querySelector(sel);
-  q('[data-testid="bookmark"]')?.click();
-  await sleep(150);
-  q('[data-testid="like"]')?.click();
-  await sleep(150);
-  const rt = q('[data-testid="retweet"]');
-  if (rt) { rt.click(); (await waitFor('[data-testid="retweetConfirm"]'))?.click(); }
+// Which windows the long press opens, from the Jev scores (all thresholds strictly "greater than"):
+// engage > 70% → reply window; repost > 50% → repost, > 70% → quote window instead of the plain repost.
+// Only one window can open; the higher score wins, a tie goes to the reply (the repost then still happens as a plain one,
+// so nothing is lost). A missing repost score keeps the old behaviour: plain repost. An already reposted post gets no
+// quote window (its repost side is done), so the reply window may open instead.
+const REPLY_AT = 0.7, REPOST_AT = 0.5, QUOTE_AT = 0.7;
+function triplePlan(answers, reposted) {
+  const reply = answers?.engage, rt = answers?.repost;
+  const wantReply = reply != null && reply > REPLY_AT, wantQuote = !reposted && rt != null && rt > QUOTE_AT;
+  const open = wantReply && (!wantQuote || reply >= rt) ? 'reply' : wantQuote ? 'quote' : null;
+  const repost = open !== 'quote' && (rt == null || rt > REPOST_AT);
+  return { repost, open };
+}
+
+// Only turns things on: an already-liked / reposted / bookmarked post is left as is. Windows open last and are never submitted.
+const busy = new WeakSet();
+async function triple(article, answers) {
+  if (busy.has(article)) return;
+  busy.add(article);
+  try {
+    const q = sel => article.querySelector(sel);
+    const { repost, open } = triplePlan(answers, !q('[data-testid="retweet"]'));
+    q('[data-testid="bookmark"]')?.click();
+    await sleep(150);
+    q('[data-testid="like"]')?.click();
+    await sleep(150);
+    const rt = q('[data-testid="retweet"]');
+    if (rt && repost) { rt.click(); (await waitFor('[data-testid="retweetConfirm"]'))?.click(); await sleep(150); }
+    // Never stack a second composer on one that is already open.
+    if (!open || document.querySelector('[role="dialog"] [data-testid^="tweetTextarea_"]')) return;
+    if (open === 'reply') { q('[data-testid="reply"]')?.click(); return; }
+    rt.click();
+    const menu = await waitFor('[data-testid="retweetConfirm"]');
+    const quote = [...document.querySelectorAll('[role="menuitem"]')].find(m => /\/compose\/(post|tweet)/.test(m.getAttribute('href') || '') || /Quote|引用/.test(m.textContent));
+    if (quote) quote.click();
+    else if (menu) menu.click(); // no Quote item found: fall back to the plain repost the score already earned
+  } finally { busy.delete(article); }
 }
 
 // ---- Timeline filter: a matched post is faded to 50% and comes back on hover. ----
