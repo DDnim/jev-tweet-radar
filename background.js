@@ -164,16 +164,17 @@ function pickPosts(mine, target, draft, works) {
   return [...picked.values()];
 }
 
-const SUGGEST_SYSTEM = `You draft replies on X (Twitter) for the account owner. You get the post they are replying to, maybe their unfinished draft, and a selection of their own past posts and replies, each with an id.
+const SUGGEST_SYSTEM = `You draft replies on X (Twitter) for the account owner. You get the post they are replying to, maybe their unfinished draft, maybe other people's replies to that post, and a selection of their own past posts and replies, each with an id.
 
-Return 2 or 3 suggestions, best first:
+Return 2 or 3 suggestions of kind "reply" or "link", best first, plus one of kind "echo" when other_replies is not empty:
 - kind "reply": a reply they could send as is. Write it the way this person writes: copy their language choice, length, tone, punctuation, emoji and hashtag habits from the past posts, above all from their past replies. Say something specific to the post: add information, an experience, a question or a clear opinion. No generic praise, no restating the post, no bullet lists, no assistant-style phrasing. If there is a draft, build on what the draft is trying to say.
 - kind "link": when one of their past posts genuinely answers, extends or illustrates what the post is about, suggest replying with that post. "text" is a short lead-in in their voice, one sentence without any URL (the link is appended automatically); "post_id" is that past post's id, copied exactly. Prefer past posts that show their own original work (work: true, or matching their list of works), since getting those seen is a goal, but only when it fits the conversation. Never push a link onto a post it does not relate to; if nothing fits, give no link suggestion. At most two link suggestions.
+- kind "echo": a reply that goes along with the other repliers: pick up the take, joke or mood most of other_replies share (or riff on one reply that stands out) and say it in their voice. Do not copy any reply word for word. Only when other_replies is given; exactly one.
 - Never state facts about them (experience, works, numbers) that are not in the past posts.
 - Write in the language of the post being replied to, unless their past replies show they answer such posts in another language.
 - Keep each text within one X post: under 280 characters of latin text, under 140 CJK characters.
 - "why": one short line in the requested UI language telling them what the suggestion draws on.
-- "post_id" is "" for kind "reply".`;
+- "post_id" is "" for kinds "reply" and "echo".`;
 
 const SUGGEST_SCHEMA = {
   type: 'object',
@@ -182,7 +183,7 @@ const SUGGEST_SCHEMA = {
       type: 'array',
       items: {
         type: 'object',
-        properties: { kind: { type: 'string', enum: ['reply', 'link'] }, text: { type: 'string' }, post_id: { type: 'string' }, why: { type: 'string' } },
+        properties: { kind: { type: 'string', enum: ['reply', 'link', 'echo'] }, text: { type: 'string' }, post_id: { type: 'string' }, why: { type: 'string' } },
         required: ['kind', 'text', 'post_id', 'why'],
         additionalProperties: false
       }
@@ -196,7 +197,7 @@ const SUGGEST_DEFAULTS = { groqKey: '', groqModel: 'openai/gpt-oss-120b', works:
 const LANG_NAME = { ja: 'Japanese', zh: 'Chinese', en: 'English' };
 const cut = (s, n) => (s || '').length > n ? s.slice(0, n) + '…' : (s || '');
 
-async function suggest({ target, draft, lang }) {
+async function suggest({ target, draft, lang, others = [] }) {
   const s = await chrome.storage.sync.get(SUGGEST_DEFAULTS);
   const { detectedHandle } = await chrome.storage.local.get('detectedHandle');
   const handle = (s.myHandle || detectedHandle || '').replace(/^@/, '');
@@ -211,6 +212,7 @@ async function suggest({ target, draft, lang }) {
     my_works: works,
     ui_language: LANG_NAME[s.lang || lang] || 'English',
     replying_to: { author: '@' + target.author, text: target.text },
+    other_replies: others.slice(0, 15).map(o => ({ author: '@' + o.author, text: cut(o.text, 200) })),
     draft: draft || '',
     my_past_posts: posts.map(p => ({
       id: p.id, date: (p.time || '').slice(0, 10), kind: p.replyTo || p.isReply ? 'reply' : 'post',
@@ -240,7 +242,7 @@ async function suggest({ target, draft, lang }) {
     const ids = new Set(posts.map(p => p.id));
     // A link must point at a post that really is in my history; anything else is dropped.
     const out = JSON.parse(text).suggestions
-      .filter(x => x.text && (x.kind === 'reply' || ids.has(x.post_id)))
+      .filter(x => x.text && (x.kind !== 'link' || ids.has(x.post_id)) && (x.kind !== 'echo' || others.length))
       .map(x => x.kind === 'link' ? { ...x, url: `https://x.com/${handle}/status/${x.post_id}`, old: cut(mine[x.post_id].text, 140) } : x);
     return { suggestions: out, used: posts.length, total: Object.keys(mine).length };
   } finally { clearInterval(keep); }

@@ -349,12 +349,22 @@ function runSuggest(box) {
   panel.style.color = getComputedStyle(box).color;
   const draft = box.innerText.replace(/​/g, '').trim();
   panel.replaceChildren(sgHead(box, panel, JEV_I18N.t('sgLoading', uiLang)));
-  send({ type: 'suggest', target, draft, lang: uiLang }, res => {
+  send({ type: 'suggest', target, draft, lang: uiLang, others: otherReplies(target) }, res => {
     if (!panel.isConnected) return;
     if (!res?.suggestions) return panel.replaceChildren(sgHead(box, panel, sgError(res)));
     const head = sgHead(box, panel, JEV_I18N.t(res.suggestions.length ? 'sgHead' : 'sgNone', uiLang, { n: res.used, t: res.total }));
     panel.replaceChildren(head, ...res.suggestions.map(x => sgItem(box, head, x)));
   });
+}
+
+// Other people's replies to the post, as far as the page shows them: on the post's own page they sit below it.
+function otherReplies(target) {
+  const all = [...document.querySelectorAll('article[data-testid="tweet"]')];
+  const i = all.findIndex(a => extract(a)?.id === target.id);
+  if (i < 0 || (location.pathname.match(/\/status\/(\d+)/) || [])[1] !== target.id) return [];
+  // The reply dialog shows a copy of the post; that copy is not a reply.
+  return all.slice(i + 1).filter(a => !a.closest('[role="dialog"]')).map(extract)
+    .filter(p => p && p.id !== target.id && p.author.toLowerCase() !== me()).map(p => ({ author: p.author, text: p.text }));
 }
 
 function sgError(res) {
@@ -379,7 +389,7 @@ function sgHead(box, panel, text) {
 
 function sgItem(box, head, x) {
   const item = document.createElement('div');
-  item.className = 'jev-sg-item' + (x.kind === 'link' ? ' jev-sg-link' : '');
+  item.className = 'jev-sg-item jev-sg-' + x.kind;
   const text = document.createElement('div');
   text.className = 'jev-sg-text';
   text.textContent = x.text;
@@ -393,7 +403,7 @@ function sgItem(box, head, x) {
   }
   const meta = document.createElement('div');
   meta.className = 'jev-sg-meta';
-  meta.textContent = JEV_I18N.t(x.kind === 'link' ? 'sgKindLink' : 'sgKindReply', uiLang) + ' · ' + x.why;
+  meta.textContent = JEV_I18N.t({ link: 'sgKindLink', echo: 'sgKindEcho' }[x.kind] || 'sgKindReply', uiLang) + ' · ' + x.why;
   item.appendChild(meta);
   item.addEventListener('click', e => {
     e.preventDefault(); e.stopPropagation();

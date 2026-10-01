@@ -71,6 +71,7 @@ const JEV_I18N = {
     sgRetry: { ja: '作り直す', zh: '重新生成', en: 'Regenerate' },
     sgKindReply: { ja: '返信', zh: '回复', en: 'Reply' },
     sgKindLink: { ja: '過去ポストを貼る', zh: '贴旧帖', en: 'Link an old post' },
+    sgKindEcho: { ja: 'ほかの返信に乗る', zh: '顺着别人的回复', en: 'Go with the thread' },
     sgCopied: { ja: '入力欄に入らなかったのでコピーしました。貼り付けてください', zh: '没能直接填入，已复制，粘贴即可', en: 'Could not fill the box; copied, paste it' },
     collecting: { ja: 'Jev: 自分のポストを収集中 · 新規 {n} 件（計 {t} 件）· クリックで停止', zh: 'Jev：正在收集我的帖子 · 新增 {n} 条（共 {t} 条）· 点击停止', en: 'Jev: collecting your posts · {n} new ({t} total) · click to stop' },
     collectDone: { ja: 'Jev: 収集完了 · 新規 {n} 件（計 {t} 件）', zh: 'Jev：收集完成 · 新增 {n} 条（共 {t} 条）', en: 'Jev: done · {n} new ({t} total)' },

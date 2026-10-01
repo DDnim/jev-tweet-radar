@@ -92,6 +92,8 @@
 .jev-sg-item:hover{background:rgba(29,155,240,.18)}
 .jev-sg-link{background:rgba(0,186,124,.08)}
 .jev-sg-link:hover{background:rgba(0,186,124,.18)}
+.jev-sg-echo{background:rgba(181,123,255,.1)}
+.jev-sg-echo:hover{background:rgba(181,123,255,.2)}
 .jev-sg-text{white-space:pre-wrap;word-break:break-word}
 .jev-sg-old{display:block;margin-top:4px;overflow:hidden;color:#00ba7c;font-size:12px;text-decoration:none;text-overflow:ellipsis;white-space:nowrap}
 .jev-sg-old:hover{text-decoration:underline}
