@@ -289,8 +289,23 @@ function replyTarget(box) {
     }
   }
   if (!article) return null;
-  const p = extract(article);
+  const p = extract(article) || dialogPost(article);
   return p ? { id: p.id, author: p.author, text: p.text } : null;
+}
+
+// The reply dialog draws the post without any /status/ link, so its id comes from the post whose reply button was
+// clicked last (same author), and the author from the @handle in the name line.
+let lastReplyClick = null;
+document.addEventListener('click', e => {
+  const article = e.target.closest?.('[data-testid="reply"]')?.closest('article[data-testid="tweet"]');
+  if (article) lastReplyClick = extract(article);
+}, true);
+function dialogPost(article) {
+  const text = article.querySelector('[data-testid="tweetText"]')?.innerText.trim() || '';
+  const author = (article.querySelector('[data-testid="User-Name"]')?.innerText.match(/@(\w{1,15})/) || [])[1];
+  if (!author) return null;
+  const id = lastReplyClick?.author.toLowerCase() === author.toLowerCase() ? lastReplyClick.id : 'dialog:' + hash(author + text);
+  return { id, author, text };
 }
 
 function wireComposer(box) {
