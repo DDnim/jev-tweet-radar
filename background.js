@@ -159,20 +159,23 @@ function pickPosts(mine, target, draft, works) {
   add(rank(all, `${target.text} ${draft || ''}`, target.author).filter(r => r.s > 0).map(r => r.p), 25);
   const workPosts = works.length ? all.filter(p => isWork(p, works)) : all.filter(p => p.hasVideo || p.card || p.links?.length);
   add(workPosts.sort((a, b) => (b.likes || 0) - (a.likes || 0)), 12);
-  add(all.filter(p => p.replyTo || p.isReply).sort(byTime), 12);
+  add(all.filter(p => p.replyTo || p.isReply).sort(byTime), 20);
   add(all.filter(p => !p.replyTo && !p.isReply).sort(byTime), 6);
   return [...picked.values()];
 }
 
 const SUGGEST_SYSTEM = `You draft replies on X (Twitter) for the account owner. You get the post they are replying to, maybe their unfinished draft, maybe other people's replies to that post, and a selection of their own past posts and replies, each with an id.
 
+Every text must sound like this person wrote it and be short:
+- Voice: study their past replies first, then their posts. Copy their word choice, sentence shape, slang, tone, punctuation, emoji and hashtag habits, and how they open and end a reply. If they never use emoji, use none. Someone who knows them should not be able to tell it apart from their own reply.
+- Brevity: say one thing. Aim for my_reply_length (the median length of their past replies, in characters) and never go past twice that. One sentence is usually enough. No preamble, no restating the post, no hedging, no generic praise, no bullet lists, no assistant-style phrasing.
+
 Return 2 or 3 suggestions of kind "reply" or "link", best first, plus one of kind "echo" when other_replies is not empty:
-- kind "reply": a reply they could send as is. Write it the way this person writes: copy their language choice, length, tone, punctuation, emoji and hashtag habits from the past posts, above all from their past replies. Say something specific to the post: add information, an experience, a question or a clear opinion. No generic praise, no restating the post, no bullet lists, no assistant-style phrasing. If there is a draft, build on what the draft is trying to say.
-- kind "link": when one of their past posts genuinely answers, extends or illustrates what the post is about, suggest replying with that post. "text" is a short lead-in in their voice, one sentence without any URL (the link is appended automatically); "post_id" is that past post's id, copied exactly. Prefer past posts that show their own original work (work: true, or matching their list of works), since getting those seen is a goal, but only when it fits the conversation. Never push a link onto a post it does not relate to; if nothing fits, give no link suggestion. At most two link suggestions.
-- kind "echo": a reply that goes along with the other repliers: pick up the take, joke or mood most of other_replies share (or riff on one reply that stands out) and say it in their voice. Do not copy any reply word for word. Only when other_replies is given; exactly one.
+- kind "reply": a reply they could send as is, with one specific point: a piece of information, an experience, a question or a clear opinion. If there is a draft, build on what the draft is trying to say.
+- kind "link": when one of their past posts genuinely answers, extends or illustrates what the post is about, suggest replying with that post. "text" is a very short lead-in in their voice (a few words to one short sentence) without any URL (the link is appended automatically); "post_id" is that past post's id, copied exactly. Prefer past posts that show their own original work (work: true, or matching their list of works), since getting those seen is a goal, but only when it fits the conversation. Never push a link onto a post it does not relate to; if nothing fits, give no link suggestion. At most two link suggestions.
+- kind "echo": a reply that goes along with the other repliers: pick up the take, joke or mood most of other_replies share (or riff on one reply that stands out) and say it in their voice, just as briefly. Do not copy any reply word for word. Only when other_replies is given; exactly one.
 - Never state facts about them (experience, works, numbers) that are not in the past posts.
 - Write in the language of the post being replied to, unless their past replies show they answer such posts in another language.
-- Keep each text within one X post: under 280 characters of latin text, under 140 CJK characters.
 - "why": one short line in the requested UI language telling them what the suggestion draws on.
 - "post_id" is "" for kinds "reply" and "echo".`;
 
@@ -192,6 +195,14 @@ const SUGGEST_SCHEMA = {
   required: ['suggestions'],
   additionalProperties: false
 };
+
+// Median length of my replies (my posts if I have no replies yet), so suggestions can be as short as I usually am.
+function replyLength(mine) {
+  const all = Object.values(mine);
+  const replies = all.filter(p => p.replyTo || p.isReply);
+  const lens = (replies.length ? replies : all).map(p => p.text.replace(/https?:\/\/\S+/g, '').trim().length).sort((a, b) => a - b);
+  return lens[Math.floor(lens.length / 2)] || 40;
+}
 
 const SUGGEST_DEFAULTS = { groqKey: '', groqModel: 'openai/gpt-oss-120b', works: '', myHandle: '', lang: '' };
 const LANG_NAME = { ja: 'Japanese', zh: 'Chinese', en: 'English' };
@@ -214,6 +225,7 @@ async function suggest({ target, draft, lang, others = [] }) {
     replying_to: { author: '@' + target.author, text: target.text },
     other_replies: others.slice(0, 15).map(o => ({ author: '@' + o.author, text: cut(o.text, 200) })),
     draft: draft || '',
+    my_reply_length: replyLength(mine),
     my_past_posts: posts.map(p => ({
       id: p.id, date: (p.time || '').slice(0, 10), kind: p.replyTo || p.isReply ? 'reply' : 'post',
       ...(p.replyTo ? { to: `@${p.replyTo.author}: ${cut(p.replyTo.text, 160)}` } : {}),

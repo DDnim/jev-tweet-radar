@@ -77,7 +77,7 @@ const JEV_I18N = {
     collectDone: { ja: 'Jev: 収集完了 · 新規 {n} 件（計 {t} 件）', zh: 'Jev：收集完成 · 新增 {n} 条（共 {t} 条）', en: 'Jev: done · {n} new ({t} total)' },
     sgLabel: { ja: '返信案（Groq）', zh: '回帖建议（Groq）', en: 'Reply suggestions (Groq)' },
     groqKey: { ja: 'Groq API キー', zh: 'Groq API key', en: 'Groq API key' },
-    groqKeyNote: { ja: 'ブラウザ内にのみ保存。「返信案」を押したときだけ、返信先のポストと自分の過去ポストの一部（最大 55 件）を api.groq.com へ送信。', zh: '仅保存在浏览器内。只有点「回帖建议」时，才会把回复对象和你的部分旧帖（最多 55 条）发送到 api.groq.com。', en: 'Stored only in your browser. Only when you click "Suggest" are the post you reply to and up to 55 of your past posts sent to api.groq.com.' },
+    groqKeyNote: { ja: 'ブラウザ内にのみ保存。「返信案」を押したときだけ、返信先のポストと自分の過去ポストの一部（最大 63 件）を api.groq.com へ送信。', zh: '仅保存在浏览器内。只有点「回帖建议」时，才会把回复对象和你的部分旧帖（最多 63 条）发送到 api.groq.com。', en: 'Stored only in your browser. Only when you click "Suggest" are the post you reply to and up to 63 of your past posts sent to api.groq.com.' },
     groqModel: { ja: 'モデル', zh: '模型', en: 'Model' },
     modelNote: { ja: '既定は gpt-oss-120b。20b はさらに速くて安い。qwen3.8 はプレビュー版。', zh: '默认 gpt-oss-120b；20b 更快更便宜；qwen3.8 是预览版。', en: 'Default gpt-oss-120b; 20b is faster and cheaper; qwen3.8 is a preview.' },
     myHandle: { ja: '自分の X アカウント（空欄なら自動認識）', zh: '我的 X 账号（留空自动识别）', en: 'My X account (blank = detect automatically)' },
