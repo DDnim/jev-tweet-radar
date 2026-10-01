@@ -34,6 +34,12 @@ X (Twitter) のタイムラインで、画面に入った各ポストを Jev（T
 ## 投稿前判定
 発言欄（返信欄も）に 8 文字以上入力して 1.2 秒止まると、同じ軸で下書きを採点してツールバーの上に表示する。返信は返信先の投稿を `state.replying_to` として一緒に送り、組み合わせで判定する。
 
+## 返信案（Groq）
+返信欄のツールバーに「返信案」ボタンが出る。押すと、自分の過去のポスト・返信をもとに [Groq](https://groq.com)（既定 `openai/gpt-oss-120b`）が自分の口調で返信案を 2〜3 個作る。返信先に合う過去ポストがあれば（特に自分の作品のポスト）、そのリンクを貼る案も出る。クリックで返信欄に入る（送信はしない）。
+- 過去ポストの収集：x.com で目に入った自分のポストは自動で保存（`chrome.storage.local`）。ポップアップの「自分のポストを集める」で自分の「返信」タブを開き、最後まで自動スクロールして集める。
+- オプションで Groq API キー、モデル、自分のアカウント（空欄なら自動認識）、自分の作品（作品名・ドメイン）を設定。
+- 送信されるのはボタンを押したときだけ：返信先のポストと、話題が近い／作品／最近の自分のポスト最大 55 件。リンクの id は集めた中に実在するものだけを使う。
+
 ## iOS Safari
 `safari/Jev Tweet Radar/` は `xcrun safari-web-extension-converter --ios-only` で作った Xcode プロジェクト。拡張のファイルはコピーせずルートのものを参照するので、Chrome 版と同じソースで動く。
 ファイルを足したら converter を `--rebuild-project` で掛け直す（`safari/`・README・LICENSE がリソースに入ったら pbxproj から外す）。
@@ -54,6 +60,7 @@ Chrome extension (MV3) that scores every post on your X timeline with **one** ca
 
 - Timeline filter: rules such as *spam ≥ 0.7* or *engage < 0.3* fade matched posts to 50% opacity; hover restores them.
 - Under the avatar: two thin vertical bars (horizontal on the open post of a detail page) (buzz / engage). The avatar column gets a rarity tint from the higher one: >75% gold, >60% purple, >45% green, else white. Long-press the column 0.6 s to bookmark + like, and let Jev's scores pick the rest (it shakes while held; never undoes, never posts): repost-worthy > 50% reposts, > 70% opens the quote window instead; worth engaging > 70% opens the reply window. Only one window opens — the higher score wins, a tie goes to reply (with a plain repost if repost-worthy > 50%). The action bar shows what will happen: a blue ✎ on the button whose window opens, a green dot on repost when it reposts directly. Posts over 85% spam or AI-ish fold to the name line (click to expand); on those, the long press blocks the author instead.
+- Reply suggestions (Groq): a "Suggest" button in the reply toolbar drafts 2–3 replies in your own voice from your past posts and replies via [Groq](https://groq.com) (default `openai/gpt-oss-120b`), or suggests linking one of your old posts when it fits — preferably one about your own work. Click one to fill the box (nothing is posted). Your posts are collected as you browse; "Collect my posts" in the popup scrolls through your Replies tab. Set the Groq key, model, account and your works in Options.
 - UI in Japanese / Chinese / English, auto-detected from the browser language, switchable in Options.
 - Load unpacked from `chrome://extensions`, paste your TypeSafe API key in Options, open x.com.
 - One judgment ≈ 300 input tokens ≈ $0.00001; output is free. The popup shows today's count and cost.
@@ -65,6 +72,7 @@ Chrome 扩展（MV3）。刷 X 时间线时，对进入视野的每条帖子只�
 
 - 时间线过滤：设置条件（如 垃圾 ≥ 0.7、值得互动 < 0.3），命中的帖子以 50% 透明度显示，鼠标移上去恢复。
 - 头像下方显示「会火」（橙）和「值得互动」（蓝）两条细竖条（帖子详情页的主帖为横条）；头像列按较高的那个值上稀有度底色：>75% 金色传说、>60% 紫色史诗、>45% 绿色稀有，其余白色。长按头像列 0.6 秒一键三连：收藏＋点赞，转发和开窗按 Jev 评分决定（按住时抖动，已做的不会取消，窗口只打开不发送）：值得转发 >50% 转发，>70% 改为打开引用转发窗；值得互动 >70% 打开回复窗。只开一个窗，分数高的优先（同分优先回复，此时值得转发 >50% 仍会普通转发）。已转发的帖子不再开引用窗。长按会触发什么直接标在操作按钮上：会打开窗口的按钮带蓝色 ✎，会直接转发时转发按钮带绿点。垃圾或 AI 味超过 85% 的帖子折叠成只剩名字一行（点击展开），这时长按改为屏蔽作者。
+- 回帖建议（Groq）：回复框工具栏里有「回帖建议」按钮，按你以前的帖子和回复，用 [Groq](https://groq.com)（默认 `openai/gpt-oss-120b`）以你的语气生成 2〜3 条建议；有切题的旧帖（尤其是宣传你原创作品的）会建议直接贴旧帖链接。点一下填进回复框，不会自动发送。浏览 x.com 时看到的自己的帖子自动保存；弹窗里点「收集我的帖子」会打开你的「回复」页自动滚到底。在设置里填 Groq API key、模型、账号和原创作品。
 - 界面支持中文 / 日本語 / English，按浏览器语言自动选择，可在设置中切换。
 - 在 `chrome://extensions` 开启开发者模式，“加载已解压的扩展程序”选择本文件夹；在设置中粘贴 TypeSafe API key；打开 x.com。
 - 1 次判定 ≈ 300 input token ≈ $0.00001，output 免费。弹窗显示今日次数和费用。

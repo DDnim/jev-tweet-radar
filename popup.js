@@ -26,5 +26,15 @@ chrome.runtime.sendMessage({ type: 'ping' }, res => {
     ].filter(Boolean).join('\n');
   });
 });
+// My posts for reply suggestions; the button opens my Replies tab and leaves a request that content.js picks up to scroll through it.
+chrome.storage.sync.get({ myHandle: '', lang: '' }, s => chrome.storage.local.get(['mine', 'detectedHandle'], l => {
+  const lang = s.lang || JEV_I18N.detect();
+  const handle = s.myHandle || l.detectedHandle || '';
+  document.getElementById('mine').textContent = JEV_I18N.t('mine', lang, { n: Object.keys(l.mine || {}).length }) + (handle ? ' · @' + handle : '');
+  document.getElementById('collect').onclick = () => {
+    if (!handle) { document.getElementById('collectMsg').textContent = JEV_I18N.t('sgNoHandle', lang); return; }
+    chrome.storage.local.set({ collectReq: Date.now() }, () => chrome.tabs.create({ url: `https://x.com/${handle}/with_replies` }));
+  };
+}));
 document.getElementById('enabled').onchange = e => chrome.storage.sync.set({ enabled: e.target.checked });
 document.getElementById('opt').onclick = e => { e.preventDefault(); chrome.runtime.openOptionsPage(); };

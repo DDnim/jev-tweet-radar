@@ -79,3 +79,23 @@
 .jev-folded [data-testid="Tweet-User-Avatar"]{opacity:.4;filter:grayscale(1)}
 .jev-fold-note{margin:2px 0 4px;color:#8b98a5;font:12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans",sans-serif;cursor:pointer}
 .jev-fold-note:hover{text-decoration:underline}
+
+/* reply suggestions: the button in the reply toolbar and the list above it (text colour follows the composer) */
+.jev-sg-btn{align-self:center;flex:none;margin:0 6px;padding:3px 10px;border:1px solid #1d9bf0;border-radius:999px;background:transparent;color:#1d9bf0;font:600 12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","PingFang SC",sans-serif;white-space:nowrap;cursor:pointer}
+.jev-sg-btn:hover{background:rgba(29,155,240,.12)}
+.jev-sg{display:grid;gap:6px;margin:6px 0 4px;padding:8px 10px;border:1px solid rgba(139,152,165,.4);border-radius:10px;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","PingFang SC",sans-serif}
+.jev-sg-head{display:flex;align-items:center;gap:6px;color:#8b98a5;font-size:11px;letter-spacing:.04em}
+.jev-sg-head span{flex:1}
+.jev-sg-head button{padding:0 4px;border:0;background:none;color:#8b98a5;font-size:15px;line-height:1;cursor:pointer}
+.jev-sg-head button:hover{color:#1d9bf0}
+.jev-sg-item{padding:8px 10px;border-radius:8px;background:rgba(29,155,240,.08);cursor:pointer}
+.jev-sg-item:hover{background:rgba(29,155,240,.18)}
+.jev-sg-link{background:rgba(0,186,124,.08)}
+.jev-sg-link:hover{background:rgba(0,186,124,.18)}
+.jev-sg-text{white-space:pre-wrap;word-break:break-word}
+.jev-sg-old{display:block;margin-top:4px;overflow:hidden;color:#00ba7c;font-size:12px;text-decoration:none;text-overflow:ellipsis;white-space:nowrap}
+.jev-sg-old:hover{text-decoration:underline}
+.jev-sg-meta{margin-top:4px;color:#8b98a5;font-size:11px}
+
+/* collecting my posts on the Replies tab */
+.jev-collect{position:fixed;left:16px;bottom:16px;z-index:9999;padding:10px 14px;border-radius:10px;background:#1d9bf0;color:#fff;font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","PingFang SC",sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer}

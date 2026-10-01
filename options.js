@@ -2,7 +2,7 @@ const TAG_ORDER = ['spam', 'buzz', 'flame', 'ignored', 'misread', 'repost', 'boo
 const RULE_ORDER = ['spam', 'ai_smell', 'flame', 'ignored', 'engage'];
 const DEFAULT_FILTER = { on: true, rules: { spam: { on: true, op: 'ge', v: 0.7 }, ai_smell: { on: false, op: 'ge', v: 0.7 }, flame: { on: false, op: 'ge', v: 0.7 }, ignored: { on: false, op: 'ge', v: 0.7 }, engage: { on: false, op: 'lt', v: 0.3 } } };
 const GOAL_ORDER = ['none', 'grow', 'learn', 'thrill', 'custom'];
-const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, tags: ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'], goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER };
+const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, tags: ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'], goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER, groqKey: '', groqModel: 'openai/gpt-oss-120b', myHandle: '', works: '' };
 const $ = id => document.getElementById(id);
 let lang = JEV_I18N.detect();
 for (const [k, v] of Object.entries(JEV_I18N.langs)) $('lang').add(new Option(v, k));
@@ -21,6 +21,7 @@ function applyLang() {
   for (const l of $('goals').querySelectorAll('label')) l.querySelector('span').textContent = JEV_I18N.goal[l.querySelector('input').value][lang];
   for (const l of $('tags').querySelectorAll('label')) l.querySelector('span').textContent = JEV_I18N.tag[l.querySelector('input').dataset.tag][lang];
   $('goalCustom').placeholder = JEV_I18N.t('goalPh', lang);
+  $('works').placeholder = JEV_I18N.t('worksPh', lang);
   for (const el of $('rules').querySelectorAll('[data-rule-name]')) el.textContent = JEV_I18N.tag[el.dataset.ruleName][lang];
   for (const sel of $('rules').querySelectorAll('select')) { sel.options[0].text = JEV_I18N.t('opGe', lang); sel.options[1].text = JEV_I18N.t('opLt', lang); }
 }
@@ -40,6 +41,8 @@ chrome.storage.sync.get(DEFAULTS, s => {
   const gr = document.querySelector(`input[name="goal"][value="${s.goalPreset}"]`); if (gr) gr.checked = true;
   $('goalCustom').value = s.goalCustom || ''; $('goalCustom').style.display = s.goalPreset === 'custom' ? 'block' : 'none';
   writeFilter(s.filter || DEFAULT_FILTER);
+  $('groqKey').value = s.groqKey; $('groqModel').value = s.groqModel; $('myHandle').value = s.myHandle; $('works').value = s.works;
 });
-$('save').onclick = () => chrome.storage.sync.set({ apiKey: $('apiKey').value.trim(), lang, threshold: +$('threshold').value, maxPerMinute: +$('maxPerMinute').value, enabled: $('enabled').checked, tags: selectedTags(), goalPreset: goalPreset(), goalCustom: $('goalCustom').value.trim(), filter: readFilter() }, () => { $('msg').textContent = JEV_I18N.t('saved', lang); setTimeout(() => $('msg').textContent = '', 1500); });
+chrome.storage.local.get('detectedHandle', l => { if (l.detectedHandle) $('myHandle').placeholder = '@' + l.detectedHandle; });
+$('save').onclick = () => chrome.storage.sync.set({ apiKey: $('apiKey').value.trim(), lang, threshold: +$('threshold').value, maxPerMinute: +$('maxPerMinute').value, enabled: $('enabled').checked, tags: selectedTags(), goalPreset: goalPreset(), goalCustom: $('goalCustom').value.trim(), filter: readFilter(), groqKey: $('groqKey').value.trim(), groqModel: $('groqModel').value, myHandle: $('myHandle').value.trim().replace(/^@/, ''), works: $('works').value.trim() }, () => { $('msg').textContent = JEV_I18N.t('saved', lang); setTimeout(() => $('msg').textContent = '', 1500); });
 $('clear').onclick = async () => { const all = await chrome.storage.local.get(null); await chrome.storage.local.remove(Object.keys(all).filter(k => k.startsWith('r:'))); $('msg').textContent = JEV_I18N.t('cleared', lang); };

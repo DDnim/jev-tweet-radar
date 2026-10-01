@@ -237,19 +237,29 @@ const wiredBoxes = new WeakSet();
 
 function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
 
-const panels = new WeakMap();
-function draftPanel(box) {
-  let panel = panels.get(box);
+// Walk up until an ancestor that also contains the composer toolbar.
+function toolbarOf(box) {
+  for (let node = box; node && node !== document.body; node = node.parentElement) {
+    const toolbar = node.querySelector?.('[data-testid="toolBar"]');
+    if (toolbar) return toolbar;
+  }
+  return null;
+}
+
+// A panel of ours right above the composer toolbar (one per box and kind).
+function panelAbove(box, map, className) {
+  let panel = map.get(box);
   if (panel && panel.isConnected) return panel;
   panel = document.createElement('div');
-  panel.className = 'jev-draft';
-  // Walk up until an ancestor that also contains the composer toolbar, then insert the panel right above that toolbar.
-  let node = box, toolbar = null;
-  while (node && node !== document.body) { toolbar = node.querySelector?.('[data-testid="toolBar"]'); if (toolbar) break; node = node.parentElement; }
+  panel.className = className;
+  const toolbar = toolbarOf(box);
   if (toolbar) toolbar.insertAdjacentElement('beforebegin', panel); else box.parentElement.appendChild(panel);
-  panels.set(box, panel);
+  map.set(box, panel);
   return panel;
 }
+
+const panels = new WeakMap();
+const draftPanel = box => panelAbove(box, panels, 'jev-draft');
 
 function renderDraft(box, answers, settings, text) {
   const panel = draftPanel(box);
@@ -308,7 +318,222 @@ function wireComposer(box) {
 }
 
 function scanComposers() {
-  for (const box of document.querySelectorAll('[data-testid^="tweetTextarea_"][contenteditable="true"]')) wireComposer(box);
+  for (const box of document.querySelectorAll('[data-testid^="tweetTextarea_"][contenteditable="true"]')) { wireComposer(box); addSuggestButton(box); }
+}
+
+// ---- Reply suggestions: a button in the reply composer's toolbar asks Groq (background.js) for replies in my voice,
+// written from my past posts, or for one of my old posts to link. A click on a suggestion fills the box; nothing is sent. ----
+const sgChecked = new WeakMap();
+function addSuggestButton(box) {
+  const toolbar = toolbarOf(box);
+  if (!toolbar || toolbar.querySelector('.jev-sg-btn')) return;
+  // Only replies get the button; the check is repeated now and then because the post above an inline box may render later.
+  if (Date.now() - (sgChecked.get(box) || 0) < 2000) return;
+  sgChecked.set(box, Date.now());
+  if (!replyTarget(box)) return;
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'jev-sg-btn';
+  btn.textContent = JEV_I18N.t('sgBtn', uiLang);
+  btn.title = JEV_I18N.t('sgTip', uiLang);
+  btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); runSuggest(box); });
+  const icons = toolbar.querySelector('[data-testid="ScrollSnap-List"]');
+  if (icons) icons.appendChild(btn); else toolbar.prepend(btn);
+}
+
+const sgPanels = new WeakMap();
+function runSuggest(box) {
+  const target = replyTarget(box);
+  if (!target) return;
+  const panel = panelAbove(box, sgPanels, 'jev-sg');
+  panel.style.color = getComputedStyle(box).color;
+  const draft = box.innerText.replace(/​/g, '').trim();
+  panel.replaceChildren(sgHead(box, panel, JEV_I18N.t('sgLoading', uiLang)));
+  send({ type: 'suggest', target, draft, lang: uiLang }, res => {
+    if (!panel.isConnected) return;
+    if (!res?.suggestions) return panel.replaceChildren(sgHead(box, panel, sgError(res)));
+    const head = sgHead(box, panel, JEV_I18N.t(res.suggestions.length ? 'sgHead' : 'sgNone', uiLang, { n: res.used, t: res.total }));
+    panel.replaceChildren(head, ...res.suggestions.map(x => sgItem(box, head, x)));
+  });
+}
+
+function sgError(res) {
+  const key = { no_groq_key: 'sgNoKey', no_handle: 'sgNoHandle', no_posts: 'sgNoPosts' }[res?.error];
+  return key ? JEV_I18N.t(key, uiLang) : 'Groq: ' + (res?.error || 'no reply');
+}
+
+function sgHead(box, panel, text) {
+  const head = document.createElement('div');
+  head.className = 'jev-sg-head';
+  const label = document.createElement('span');
+  label.textContent = text;
+  const again = document.createElement('button');
+  again.type = 'button'; again.textContent = '↻'; again.title = JEV_I18N.t('sgRetry', uiLang);
+  again.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); runSuggest(box); });
+  const close = document.createElement('button');
+  close.type = 'button'; close.textContent = '×';
+  close.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); panel.remove(); });
+  head.append(label, again, close);
+  return head;
+}
+
+function sgItem(box, head, x) {
+  const item = document.createElement('div');
+  item.className = 'jev-sg-item' + (x.kind === 'link' ? ' jev-sg-link' : '');
+  const text = document.createElement('div');
+  text.className = 'jev-sg-text';
+  text.textContent = x.text;
+  item.appendChild(text);
+  if (x.kind === 'link') {
+    const old = document.createElement('a');
+    old.className = 'jev-sg-old'; old.href = x.url; old.target = '_blank'; old.rel = 'noopener';
+    old.textContent = '↳ ' + x.old;
+    old.addEventListener('click', e => e.stopPropagation());
+    item.appendChild(old);
+  }
+  const meta = document.createElement('div');
+  meta.className = 'jev-sg-meta';
+  meta.textContent = JEV_I18N.t(x.kind === 'link' ? 'sgKindLink' : 'sgKindReply', uiLang) + ' · ' + x.why;
+  item.appendChild(meta);
+  item.addEventListener('click', e => {
+    e.preventDefault(); e.stopPropagation();
+    fill(box, x.kind === 'link' ? `${x.text} ${x.url}` : x.text).then(ok => { if (!ok) head.firstChild.textContent = JEV_I18N.t('sgCopied', uiLang); });
+  });
+  return item;
+}
+
+// Replaces the composer's text the way typing would, so X's editor keeps its state; falls back to a paste, then the clipboard.
+async function fill(box, text) {
+  const flat = s => s.replace(/​/g, '').replace(/\s+/g, ' ').trim();
+  const landed = () => flat(box.innerText).includes(flat(text).slice(0, 20));
+  const selectAll = async () => {
+    box.focus();
+    const range = document.createRange();
+    range.selectNodeContents(box);
+    getSelection().removeAllRanges();
+    getSelection().addRange(range);
+    await sleep(30); // let the editor see the new selection
+  };
+  await selectAll();
+  document.execCommand('insertText', false, text);
+  await sleep(60);
+  if (landed()) return true;
+  await selectAll();
+  const dt = new DataTransfer();
+  dt.setData('text/plain', text);
+  box.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+  await sleep(60);
+  if (landed()) return true;
+  try { await navigator.clipboard.writeText(text); } catch (_) {}
+  return false;
+}
+
+// ---- My own posts and replies: every one of mine that shows up on a page is sent to background.js and kept there. ----
+let manualHandle = '', detectedHandle = '';
+const me = () => (manualHandle || detectedHandle).toLowerCase();
+chrome.storage.sync.get({ myHandle: '' }, s => { manualHandle = s.myHandle.replace(/^@/, ''); });
+chrome.storage.local.get('detectedHandle', l => { detectedHandle = detectedHandle || l.detectedHandle || ''; });
+chrome.storage.onChanged.addListener((c, area) => { if (area === 'sync' && c.myHandle) manualHandle = (c.myHandle.newValue || '').replace(/^@/, ''); });
+
+// The logged-in account: the Profile link in the side bar, or the @handle on the account switcher.
+function detectHandle() {
+  const h = document.querySelector('a[data-testid="AppTabBar_Profile_Link"]')?.getAttribute('href')?.replace(/^\//, '') ||
+    (document.querySelector('[data-testid="SideNav_AccountSwitcher_Button"]')?.innerText.match(/@(\w{1,15})/) || [])[1];
+  if (!h || h === detectedHandle) return;
+  detectedHandle = h;
+  try { chrome.storage.local.set({ detectedHandle: h }); } catch (_) {}
+}
+
+// "1,234" / "1.2K" / "3.4M" / "1.2万" → number.
+function count(el) {
+  const m = (el?.innerText || '').trim().replace(/,/g, '').match(/^([\d.]+)\s*([KkMm万萬])?/);
+  return m ? Math.round(parseFloat(m[1]) * ({ k: 1e3, m: 1e6, 万: 1e4, 萬: 1e4 }[(m[2] || '').toLowerCase()] || 1)) : 0;
+}
+
+// The post a reply of mine answers, where the page makes it certain: on my Replies tab the parent sits right above my reply,
+// and on a post page the open post's ancestors sit above it. A repost (social context line) above is not a parent.
+function parentOf(article, post) {
+  const focal = (location.pathname.match(/\/status\/(\d+)/) || [])[1];
+  if (location.pathname.toLowerCase() !== `/${me()}/with_replies` && focal !== post.id) return null;
+  const all = [...document.querySelectorAll('article[data-testid="tweet"]')];
+  const prev = all[all.indexOf(article) - 1];
+  if (!prev || prev.querySelector('[data-testid="socialContext"]')) return null;
+  const p = extract(prev);
+  return p && p.author.toLowerCase() !== me() ? { id: p.id, author: p.author, text: p.text } : null;
+}
+
+const REPLYING = /^(Replying to|返信先|回复|回覆)\s*[:：]?\s*\n?@\w/m;
+function mineOf(article) {
+  const post = extract(article);
+  if (!post || post.author.toLowerCase() !== me()) return null;
+  const textEl = article.querySelector('[data-testid="tweetText"]');
+  const replyTo = parentOf(article, post);
+  return {
+    id: post.id, text: post.text, time: post.time,
+    isReply: !!replyTo || REPLYING.test(article.innerText),
+    replyTo,
+    // t.co anchors show the real address as their text (cut with "…" when long).
+    links: [...textEl.querySelectorAll('a[href^="https://t.co/"]')].map(a => a.innerText.replace(/…$/, '').trim()).filter(Boolean),
+    card: article.querySelector('[data-testid="card.wrapper"]')?.innerText.replace(/\s+/g, ' ').trim() || '',
+    hasVideo: !!article.querySelector('[data-testid="videoPlayer"], [data-testid="videoComponent"]'),
+    likes: count(article.querySelector('[data-testid="like"], [data-testid="unlike"]'))
+  };
+}
+
+const mineSeen = new WeakSet(), mineQueue = new Map();
+let mineTimer = null, mineTotal = 0, collector = null;
+function keepMine(article) {
+  if (mineSeen.has(article) || !me()) return;
+  mineSeen.add(article);
+  const p = mineOf(article);
+  if (!p) return;
+  mineQueue.set(p.id, p);
+  if (!mineTimer) mineTimer = setTimeout(flushMine, 3000);
+}
+function flushMine() {
+  clearTimeout(mineTimer);
+  mineTimer = null;
+  const posts = [...mineQueue.values()];
+  mineQueue.clear();
+  if (!posts.length) return Promise.resolve();
+  return new Promise(done => send({ type: 'mine', posts }, res => { if (res?.total != null) { mineTotal = res.total; collector?.(res.added); } done(); }));
+}
+
+// ---- Collect: the popup opens /<me>/with_replies and leaves a request; this page then scrolls to the end on its own. ----
+let lastPath = '';
+async function maybeCollect() {
+  if (location.pathname === lastPath || !me()) return;
+  lastPath = location.pathname;
+  if (lastPath.toLowerCase() !== `/${me()}/with_replies`) return;
+  const { collectReq } = await chrome.storage.local.get('collectReq');
+  if (!collectReq || Date.now() - collectReq > 120_000) return;
+  chrome.storage.local.remove('collectReq');
+  collect();
+}
+
+async function collect() {
+  const bar = document.createElement('div');
+  bar.className = 'jev-collect';
+  let added = 0, stop = false;
+  const show = done => { bar.textContent = JEV_I18N.t(done ? 'collectDone' : 'collecting', uiLang, { n: added, t: mineTotal }); };
+  collector = n => { added += n; show(); };
+  bar.onclick = () => { stop = true; };
+  document.body.appendChild(bar);
+  show();
+  // X loads older posts as the page nears its end; stop after ~12 s without the page growing or anything new arriving.
+  let idle = 0, lastH = 0, lastAdded = 0;
+  while (!stop && idle < 8) {
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    await sleep(1500);
+    const h = document.documentElement.scrollHeight;
+    idle = h === lastH && added === lastAdded ? idle + 1 : 0;
+    lastH = h; lastAdded = added;
+  }
+  await flushMine();
+  collector = null;
+  show(true);
+  bar.onclick = () => bar.remove();
+  setTimeout(() => bar.remove(), 15000);
 }
 
 function renderNote(article, text) {
@@ -350,7 +575,10 @@ function heartbeat(n) {
 
 function scan() {
   heartbeat(document.querySelectorAll('article[data-testid="tweet"]').length);
+  detectHandle();
+  maybeCollect();
   for (const a of document.querySelectorAll('article[data-testid="tweet"]')) {
+    keepMine(a);
     if (seen.has(a)) continue;
     seen.add(a);
     io.observe(a);
