@@ -321,7 +321,7 @@ function scanComposers() {
   for (const box of document.querySelectorAll('[data-testid^="tweetTextarea_"][contenteditable="true"]')) { wireComposer(box); addSuggestButton(box); }
 }
 
-// ---- Reply suggestions: a button in the reply composer's toolbar asks Groq (background.js) for replies in my voice,
+// ---- Reply suggestions: a button in the reply composer's toolbar asks Groq or DeepSeek (background.js) for replies in my voice,
 // written from my past posts, or for one of my old posts to link. A click on a suggestion fills the box; nothing is sent. ----
 const sgChecked = new WeakMap();
 function addSuggestButton(box) {
@@ -368,8 +368,8 @@ function otherReplies(target) {
 }
 
 function sgError(res) {
-  const key = { no_groq_key: 'sgNoKey', no_handle: 'sgNoHandle', no_posts: 'sgNoPosts' }[res?.error];
-  return key ? JEV_I18N.t(key, uiLang) : 'Groq: ' + (res?.error || 'no reply');
+  const key = { no_ai_key: 'sgNoKey', no_handle: 'sgNoHandle', no_posts: 'sgNoPosts' }[res?.error];
+  return key ? JEV_I18N.t(key, uiLang, { p: res.provider || '' }) : (res?.error || 'no reply');
 }
 
 function sgHead(box, panel, text) {

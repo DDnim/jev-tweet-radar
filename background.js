@@ -204,7 +204,24 @@ function replyLength(mine) {
   return lens[Math.floor(lens.length / 2)] || 40;
 }
 
-const SUGGEST_DEFAULTS = { groqKey: '', groqModel: 'openai/gpt-oss-120b', works: '', myHandle: '', lang: '' };
+const SUGGEST_DEFAULTS = { aiProvider: 'groq', groqKey: '', groqModel: 'openai/gpt-oss-120b', deepseekKey: '', deepseekModel: 'deepseek-flash', works: '', myHandle: '', lang: '' };
+
+// Both speak the OpenAI chat format. Groq enforces the JSON schema; DeepSeek only has a JSON mode, so it gets the shape in words.
+const PROVIDERS = {
+  groq: {
+    name: 'Groq', url: 'https://api.groq.com/openai/v1/chat/completions',
+    extra: model => ({
+      response_format: { type: 'json_schema', json_schema: { name: 'suggestions', strict: true, schema: SUGGEST_SCHEMA } },
+      ...(model.startsWith('openai/gpt-oss') ? { reasoning_effort: 'low' } : {})
+    }),
+    system: SUGGEST_SYSTEM
+  },
+  deepseek: {
+    name: 'DeepSeek', url: 'https://api.deepseek.com/chat/completions',
+    extra: () => ({ response_format: { type: 'json_object' }, reasoning_effort: 'low' }),
+    system: SUGGEST_SYSTEM + '\n\nAnswer with json only, shaped like {"suggestions":[{"kind":"reply","text":"...","post_id":"","why":"..."}]}.'
+  }
+};
 const LANG_NAME = { ja: 'Japanese', zh: 'Chinese', en: 'English' };
 const cut = (s, n) => (s || '').length > n ? s.slice(0, n) + '…' : (s || '');
 
@@ -212,7 +229,8 @@ async function suggest({ target, draft, lang, others = [] }) {
   const s = await chrome.storage.sync.get(SUGGEST_DEFAULTS);
   const { detectedHandle } = await chrome.storage.local.get('detectedHandle');
   const handle = (s.myHandle || detectedHandle || '').replace(/^@/, '');
-  if (!s.groqKey) return { error: 'no_groq_key' };
+  const provider = PROVIDERS[s.aiProvider] || PROVIDERS.groq, key = s[s.aiProvider + 'Key'], model = s[s.aiProvider + 'Model'];
+  if (!key) return { error: 'no_ai_key', provider: provider.name };
   if (!handle) return { error: 'no_handle' };
   const mine = await loadMine();
   if (!Object.keys(mine).length) return { error: 'no_posts' };
@@ -234,27 +252,22 @@ async function suggest({ target, draft, lang, others = [] }) {
       ...(p.likes ? { likes: p.likes } : {}), ...(works.length && isWork(p, works) ? { work: true } : {})
     }))
   };
-  const body = {
-    model: s.groqModel,
-    messages: [{ role: 'system', content: SUGGEST_SYSTEM }, { role: 'user', content: JSON.stringify(input) }],
-    response_format: { type: 'json_schema', json_schema: { name: 'suggestions', strict: true, schema: SUGGEST_SCHEMA } },
-    ...(s.groqModel.startsWith('openai/gpt-oss') ? { reasoning_effort: 'low' } : {})
-  };
+  const body = { model, messages: [{ role: 'system', content: provider.system }, { role: 'user', content: JSON.stringify(input) }], ...provider.extra(model) };
   // A service worker is stopped when a fetch takes over 30 s to answer; an extension API call every 20 s keeps it up.
   const keep = setInterval(() => chrome.runtime.getPlatformInfo(), 20_000);
   try {
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const r = await fetch(provider.url, {
       method: 'POST',
-      headers: { Authorization: 'Bearer ' + s.groqKey, 'Content-Type': 'application/json' },
+      headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
       body: JSON.stringify(body), signal: AbortSignal.timeout(60_000)
     });
-    if (!r.ok) throw new Error(`Groq HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`);
+    if (!r.ok) throw new Error(`${provider.name} HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`);
     const text = (await r.json()).choices?.[0]?.message?.content;
-    if (!text) throw new Error('Groq returned no text');
+    if (!text) throw new Error(provider.name + ' returned no text');
     const ids = new Set(posts.map(p => p.id));
     // A link must point at a post that really is in my history; anything else is dropped.
-    const out = JSON.parse(text).suggestions
-      .filter(x => x.text && (x.kind !== 'link' || ids.has(x.post_id)) && (x.kind !== 'echo' || others.length))
+    const out = (JSON.parse(text).suggestions || [])
+      .filter(x => typeof x?.text === 'string' && x.text && ['reply', 'link', 'echo'].includes(x.kind) && (x.kind !== 'link' || ids.has(x.post_id)) && (x.kind !== 'echo' || others.length))
       .map(x => x.kind === 'link' ? { ...x, url: `https://x.com/${handle}/status/${x.post_id}`, old: cut(mine[x.post_id].text, 140) } : x);
     return { suggestions: out, used: posts.length, total: Object.keys(mine).length };
   } finally { clearInterval(keep); }

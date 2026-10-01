@@ -2,7 +2,7 @@ const TAG_ORDER = ['spam', 'buzz', 'flame', 'ignored', 'misread', 'repost', 'boo
 const RULE_ORDER = ['spam', 'ai_smell', 'flame', 'ignored', 'engage'];
 const DEFAULT_FILTER = { on: true, rules: { spam: { on: true, op: 'ge', v: 0.7 }, ai_smell: { on: false, op: 'ge', v: 0.7 }, flame: { on: false, op: 'ge', v: 0.7 }, ignored: { on: false, op: 'ge', v: 0.7 }, engage: { on: false, op: 'lt', v: 0.3 } } };
 const GOAL_ORDER = ['none', 'grow', 'learn', 'thrill', 'custom'];
-const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, tags: ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'], goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER, groqKey: '', groqModel: 'openai/gpt-oss-120b', myHandle: '', works: '' };
+const DEFAULTS = { apiKey: '', enabled: true, lang: '', threshold: 0.5, maxPerMinute: 120, tags: ['spam', 'buzz', 'misread', 'repost', 'bookmark', 'ai_smell'], goalPreset: 'none', goalCustom: '', filter: DEFAULT_FILTER, aiProvider: 'groq', groqKey: '', groqModel: 'openai/gpt-oss-120b', deepseekKey: '', deepseekModel: 'deepseek-flash', myHandle: '', works: '' };
 const $ = id => document.getElementById(id);
 let lang = JEV_I18N.detect();
 for (const [k, v] of Object.entries(JEV_I18N.langs)) $('lang').add(new Option(v, k));
@@ -30,6 +30,9 @@ function writeFilter(f) {
   $('filterOn').checked = !!f.on;
   for (const t of RULE_ORDER) { const r = { ...DEFAULT_FILTER.rules[t], ...(f.rules?.[t] || {}) }; $('rules').querySelector(`[data-rule="${t}"]`).checked = r.on; $('rules').querySelector(`[data-rule-op="${t}"]`).value = r.op; $('rules').querySelector(`[data-rule-v="${t}"]`).value = r.v; }
 }
+// Only the chosen provider's key and model are shown.
+function showProvider() { for (const p of ['groq', 'deepseek']) $('p-' + p).style.display = $('aiProvider').value === p ? '' : 'none'; }
+$('aiProvider').onchange = showProvider;
 const goalPreset = () => document.querySelector('input[name="goal"]:checked')?.value || 'none';
 $('goals').addEventListener('change', () => { $('goalCustom').style.display = goalPreset() === 'custom' ? 'block' : 'none'; });
 $('lang').onchange = () => { lang = $('lang').value; applyLang(); };
@@ -41,8 +44,8 @@ chrome.storage.sync.get(DEFAULTS, s => {
   const gr = document.querySelector(`input[name="goal"][value="${s.goalPreset}"]`); if (gr) gr.checked = true;
   $('goalCustom').value = s.goalCustom || ''; $('goalCustom').style.display = s.goalPreset === 'custom' ? 'block' : 'none';
   writeFilter(s.filter || DEFAULT_FILTER);
-  $('groqKey').value = s.groqKey; $('groqModel').value = s.groqModel; $('myHandle').value = s.myHandle; $('works').value = s.works;
+  $('groqKey').value = s.groqKey; $('groqModel').value = s.groqModel; $('deepseekKey').value = s.deepseekKey; $('deepseekModel').value = s.deepseekModel; $('aiProvider').value = s.aiProvider; showProvider(); $('myHandle').value = s.myHandle; $('works').value = s.works;
 });
 chrome.storage.local.get('detectedHandle', l => { if (l.detectedHandle) $('myHandle').placeholder = '@' + l.detectedHandle; });
-$('save').onclick = () => chrome.storage.sync.set({ apiKey: $('apiKey').value.trim(), lang, threshold: +$('threshold').value, maxPerMinute: +$('maxPerMinute').value, enabled: $('enabled').checked, tags: selectedTags(), goalPreset: goalPreset(), goalCustom: $('goalCustom').value.trim(), filter: readFilter(), groqKey: $('groqKey').value.trim(), groqModel: $('groqModel').value, myHandle: $('myHandle').value.trim().replace(/^@/, ''), works: $('works').value.trim() }, () => { $('msg').textContent = JEV_I18N.t('saved', lang); setTimeout(() => $('msg').textContent = '', 1500); });
+$('save').onclick = () => chrome.storage.sync.set({ apiKey: $('apiKey').value.trim(), lang, threshold: +$('threshold').value, maxPerMinute: +$('maxPerMinute').value, enabled: $('enabled').checked, tags: selectedTags(), goalPreset: goalPreset(), goalCustom: $('goalCustom').value.trim(), filter: readFilter(), aiProvider: $('aiProvider').value, groqKey: $('groqKey').value.trim(), groqModel: $('groqModel').value, deepseekKey: $('deepseekKey').value.trim(), deepseekModel: $('deepseekModel').value, myHandle: $('myHandle').value.trim().replace(/^@/, ''), works: $('works').value.trim() }, () => { $('msg').textContent = JEV_I18N.t('saved', lang); setTimeout(() => $('msg').textContent = '', 1500); });
 $('clear').onclick = async () => { const all = await chrome.storage.local.get(null); await chrome.storage.local.remove(Object.keys(all).filter(k => k.startsWith('r:'))); $('msg').textContent = JEV_I18N.t('cleared', lang); };
