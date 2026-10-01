@@ -354,10 +354,25 @@ function addSuggestButton(box) {
   btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); runSuggest(box); });
   const icons = toolbar.querySelector('[data-testid="ScrollSnap-List"]');
   if (icons) icons.appendChild(btn); else toolbar.prepend(btn);
+  autoSuggest(box);
+}
+
+// Jev scores by post id, kept as results arrive, so a reply box can tell how promising its post is.
+const scores = new Map();
+// A post Jev rates over 50% to buzz or to be worth engaging gets suggestions as soon as its reply box opens.
+// The score may still be on its way when the box appears, so it is awaited for a few seconds.
+const AUTO_AT = 0.5;
+async function autoSuggest(box) {
+  const target = replyTarget(box);
+  for (let t = 0; target && t < 6000 && box.isConnected; t += 500) {
+    const a = scores.get(target.id);
+    if (a) { if (Math.max(a.buzz ?? 0, a.engage ?? 0) > AUTO_AT && !sgPanels.get(box)?.isConnected) runSuggest(box, true); return; }
+    await sleep(500);
+  }
 }
 
 const sgPanels = new WeakMap();
-function runSuggest(box) {
+function runSuggest(box, auto = false) {
   const target = replyTarget(box);
   if (!target) return;
   const panel = panelAbove(box, sgPanels, 'jev-sg');
@@ -366,6 +381,8 @@ function runSuggest(box) {
   panel.replaceChildren(sgHead(box, panel, JEV_I18N.t('sgLoading', uiLang)));
   send({ type: 'suggest', target, draft, lang: uiLang, others: otherReplies(target) }, res => {
     if (!panel.isConnected) return;
+    // An automatic run stays quiet about setup (no key, no posts yet); a click explains it.
+    if (!res?.suggestions && auto && ['no_ai_key', 'no_handle', 'no_posts'].includes(res?.error)) return panel.remove();
     if (!res?.suggestions) return panel.replaceChildren(sgHead(box, panel, sgError(res)));
     const head = sgHead(box, panel, JEV_I18N.t(res.suggestions.length ? 'sgHead' : 'sgNone', uiLang, { n: res.used, t: res.total }));
     panel.replaceChildren(head, ...res.suggestions.map(x => sgItem(box, head, x)));
@@ -585,7 +602,7 @@ const io = new IntersectionObserver(entries => {
     if (!post) continue;
     send({ type: 'judge', post }, res => {
       if (!res) return;
-      if (res.answers) render(article, res.answers, res.settings || {}, res.filtered);
+      if (res.answers) { scores.set(post.id, res.answers); render(article, res.answers, res.settings || {}, res.filtered); }
       else if (res.error === 'no_key') renderNote(article, JEV_I18N.t('noKey', uiLang));
       else if (res.error) renderNote(article, 'Jev: ' + res.error);
       else if (res.skipped === 'rate') { seen.delete?.(article); setTimeout(() => io.observe(article), 15000); }
