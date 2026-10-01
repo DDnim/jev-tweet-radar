@@ -412,28 +412,26 @@ function sgItem(box, head, x) {
   return item;
 }
 
-// Replaces the composer's text the way typing would, so X's editor keeps its state; falls back to a paste, then the clipboard.
+// Replaces the composer's text the way typing would, so X's editor keeps its state. X's editor redraws the box a moment
+// later, so the result is polled; a synthetic paste is tried only when the typing command was refused outright,
+// otherwise a slow redraw would get the text a second time. Last resort: the clipboard.
 async function fill(box, text) {
-  const flat = s => s.replace(/​/g, '').replace(/\s+/g, ' ').trim();
-  const landed = () => flat(box.innerText).includes(flat(text).slice(0, 20));
-  const selectAll = async () => {
-    box.focus();
-    const range = document.createRange();
-    range.selectNodeContents(box);
-    getSelection().removeAllRanges();
-    getSelection().addRange(range);
-    await sleep(30); // let the editor see the new selection
+  const flat = s => s.replace(/\u200b/g, '').replace(/\s+/g, ' ').trim();
+  const landed = async () => {
+    for (let t = 0; t < 1000; t += 50) { if (flat(box.innerText).includes(flat(text).slice(0, 20))) return true; await sleep(50); }
+    return false;
   };
-  await selectAll();
-  document.execCommand('insertText', false, text);
-  await sleep(60);
-  if (landed()) return true;
-  await selectAll();
+  box.focus();
+  const range = document.createRange();
+  range.selectNodeContents(box);
+  getSelection().removeAllRanges();
+  getSelection().addRange(range);
+  await sleep(30); // let the editor see the new selection
+  if (document.execCommand('insertText', false, text)) return landed();
   const dt = new DataTransfer();
   dt.setData('text/plain', text);
   box.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
-  await sleep(60);
-  if (landed()) return true;
+  if (await landed()) return true;
   try { await navigator.clipboard.writeText(text); } catch (_) {}
   return false;
 }
